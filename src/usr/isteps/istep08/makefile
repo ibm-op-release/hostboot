@@ -5,7 +5,7 @@
 #
 # OpenPOWER HostBoot Project
 #
-# Contributors Listed Below - COPYRIGHT 2015,2017
+# Contributors Listed Below - COPYRIGHT 2015,2018
 # [+] International Business Machines Corp.
 #
 #
@@ -52,7 +52,6 @@ OBJS += call_proc_chiplet_fabric_scominit.o
 OBJS += call_proc_xbus_scominit.o
 OBJS += call_proc_xbus_enable_ridi.o
 OBJS += call_host_attnlisten_proc.o
-OBJS += sbe_extract_rc_handler.o
 OBJS += call_host_set_voltages.o
 
 VPATH += ${PROCEDURES_PATH}/hwp/perv/ ${PROCEDURES_PATH}/hwp/nest/
