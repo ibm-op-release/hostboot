@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2016,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2016,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -280,6 +280,21 @@ inline void set_trfc_cycles( fapi2::buffer<uint64_t>& io_data, const uint64_t i_
 {
     FAPI_DBG("seq_timing0 trfc_cycles: 0x%llx", i_value);
     io_data.insertFromRight<TT::TRFC_CYCLES, TT::TRFC_CYCLES_LEN>(i_value);
+}
+
+///
+/// @brief Get SEQ_MEM_TIMING_PARAM0_TRFC_CYCLES
+/// @tparam T fapi2 Target Type - derived
+/// @tparam TT traits type defaults to seqTraits<T>
+/// @param[in] i_data the value of the register
+/// @param[out] o_value value representing trfc value in cycles
+/// @return fapi2::ReturnCode FAPI2_RC_SUCCESS if ok
+///
+template< fapi2::TargetType T = fapi2::TARGET_TYPE_MCA, typename TT = seqTraits<T> >
+inline void get_trfc_cycles( const fapi2::buffer<uint64_t>& i_data, uint64_t& o_value )
+{
+    i_data.extractToRight<TT::TRFC_CYCLES, TT::TRFC_CYCLES_LEN>(o_value);
+    FAPI_DBG("seq_timing0 trfc_cycles: 0x%llx", o_value);
 }
 
 ///
