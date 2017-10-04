@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2014,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2014,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -246,7 +246,7 @@ enum occCfgDataVersion
     OCC_CFGDATA_FREQ_POINT_VERSION    = 0x20,
     OCC_CFGDATA_APSS_VERSION          = 0x20,
     OCC_CFGDATA_PCAP_CONFIG_VERSION   = 0x20,
-    OCC_CFGDATA_SYS_CONFIG_VERSION    = 0x20,
+    OCC_CFGDATA_SYS_CONFIG_VERSION    = 0x21,
     OCC_CFGDATA_TCT_CONFIG_VERSION    = 0x20,
     OCC_CFGDATA_AVSBUS_CONFIG_VERSION = 0X01,
 };
@@ -838,6 +838,7 @@ void getSystemConfigMessageData(const TargetHandle_t i_occ, uint8_t* o_data,
         index += 4;
     }
 
+
     //Backplane Callout Sensor ID
     SensorID1 = UTIL::getSensorNumber(node, SENSOR_NAME_BACKPLANE_FAULT);
     memcpy(&o_data[index], &SensorID1, 4);
@@ -845,6 +846,16 @@ void getSystemConfigMessageData(const TargetHandle_t i_occ, uint8_t* o_data,
 
     //APSS Callout Sensor ID
     SensorID1 = UTIL::getSensorNumber(node, SENSOR_NAME_APSS_FAULT);
+    memcpy(&o_data[index], &SensorID1, 4);
+    index += 4;
+
+    //Format 21 - VRM VDD Callout Sensor ID
+    SensorID1 = UTIL::getSensorNumber(node, SENSOR_NAME_VRM_VDD_FAULT);
+    memcpy(&o_data[index], &SensorID1, 4);
+    index += 4;
+
+    //Format 21 - VRM VDD Temperature Sensor ID
+    SensorID1 = UTIL::getSensorNumber(node, SENSOR_NAME_VRM_VDD_TEMP);
     memcpy(&o_data[index], &SensorID1, 4);
     index += 4;
 
@@ -1018,6 +1029,34 @@ void getThermalControlMessageData(uint8_t* o_data,
     o_data[index++] = OCC_NOT_DEFINED;      //PM_ERROR
     o_data[index++] = l_timeout;
     l_numSets++;
+
+    // VRM Vdd
+    if(!l_sys->tryGetAttr<ATTR_OPEN_POWER_VRM_VDD_DVFS_TEMP_DEG_C>(l_DVFS_temp))
+        l_DVFS_temp = OCC_NOT_DEFINED;
+    if (l_DVFS_temp == 0)
+    {
+        l_DVFS_temp = OCC_NOT_DEFINED;
+    }
+    if(!l_sys->tryGetAttr<ATTR_OPEN_POWER_VRM_VDD_ERROR_TEMP_DEG_C>(l_ERR_temp))
+        l_ERR_temp = OCC_NOT_DEFINED;
+    if (l_ERR_temp == 0)
+    {
+        l_ERR_temp = OCC_NOT_DEFINED;
+    }
+    if(!l_sys->tryGetAttr<ATTR_OPEN_POWER_VRM_VDD_READ_TIMEOUT_SEC>(l_timeout))
+        l_timeout = OCC_NOT_DEFINED;
+    if(l_timeout == 0)
+    {
+        l_timeout = OCC_NOT_DEFINED;
+    }
+    o_data[index++] = CFGDATA_FRU_TYPE_VRM_VDD;
+    o_data[index++] = l_DVFS_temp;          //DVFS
+    o_data[index++] = l_ERR_temp;           //ERROR
+    o_data[index++] = OCC_NOT_DEFINED;      //PM_DVFS
+    o_data[index++] = OCC_NOT_DEFINED;      //PM_ERROR
+    o_data[index++] = l_timeout;
+    l_numSets++;
+
 
     o_data[l_numSetsOffset] = l_numSets;
     o_size = index;
