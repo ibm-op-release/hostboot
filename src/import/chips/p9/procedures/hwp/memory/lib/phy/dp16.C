@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2015,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2015,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -618,6 +618,15 @@ const std::vector< uint64_t > dp16Traits<TARGET_TYPE_MCA>::WR_ERROR0_REG =
     MCA_DDRPHY_DP16_WR_ERROR0_P0_2,
     MCA_DDRPHY_DP16_WR_ERROR0_P0_3,
     MCA_DDRPHY_DP16_WR_ERROR0_P0_4,
+};
+
+const std::vector< uint64_t > dp16Traits<TARGET_TYPE_MCA>::DATA_BIT_ENABLE1 =
+{
+    MCA_DDRPHY_DP16_DATA_BIT_ENABLE1_P0_0,
+    MCA_DDRPHY_DP16_DATA_BIT_ENABLE1_P0_1,
+    MCA_DDRPHY_DP16_DATA_BIT_ENABLE1_P0_2,
+    MCA_DDRPHY_DP16_DATA_BIT_ENABLE1_P0_3,
+    MCA_DDRPHY_DP16_DATA_BIT_ENABLE1_P0_4,
 };
 
 // Definition of the READ_DELAY registers, per rank pair
