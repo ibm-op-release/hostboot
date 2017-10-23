@@ -5,7 +5,7 @@
 #
 # OpenPOWER HostBoot Project
 #
-# Contributors Listed Below - COPYRIGHT 2016,2017
+# Contributors Listed Below - COPYRIGHT 2016,2018
 # [+] International Business Machines Corp.
 #
 #
@@ -31,8 +31,10 @@ EXTRAINCDIR += ${ROOTPATH}/src/include/usr/fapi2/
 EXTRAINCDIR += ${ROOTPATH}/src/import/chips/p9/common/include/
 EXTRAINCDIR += ${ROOTPATH}/src/import/chips/p9/common/pmlib/include/registers/
 EXTRAINCDIR += ${ROOTPATH}/src/import/chips/p9/procedures/hwp/lib/
+EXTRAINCDIR += ${ROOTPATH}/src/import/chips/p9/procedures/hwp/pm/include/registers/
 EXTRAINCDIR += ${ROOTPATH}/src/import/chips/p9/procedures/utils/stopreg/
 
+HWP_LIB_PATH += ${ROOTPATH}/src/import/chips/p9/procedures/hwp/lib/
 HWP_PM_PATH += ${ROOTPATH}/src/import/chips/p9/procedures/hwp/pm
 EXTRAINCDIR += ${HWP_PM_PATH}
 HWP_CUST_PATH += ${ROOTPATH}/src/import/chips/p9/procedures/hwp/customize
@@ -60,9 +62,11 @@ EXTRAINCDIR += ${ROOTPATH}/src/include/usr/util/
 OBJS += pm_common.o
 OBJS += occAccess.o
 OBJS += occCheckstop.o
+OBJS += p9_setup_evid.o
+OBJS += p9_avsbus_lib.o
 
 ##  NOTE: add a new directory onto the vpaths when you add a new HWP
-VPATH += ${HWP_PM_PATH} ${HWP_CUST_PATH} ${HWP_ACC_PATH}
+VPATH += ${HWP_PM_PATH} ${HWP_CUST_PATH} ${HWP_ACC_PATH} ${HWP_LIB_PATH}
 VPATH += ${HWP_XIP_PATH} ${HWP_IMAGEPROCS_PATH}
 VPATH += ${HWP_XIP_PATH} ${HWP_IMAGEPROCS_PATH} ${HWP_STOPUTIL_PATH}
 VPATH += ${NEST_UTIL_PATH}
