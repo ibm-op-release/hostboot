@@ -32,6 +32,7 @@ EXTRAINCDIR += ${ROOTPATH}/src/import/chips/p9/utils
 EXTRAINCDIR += ${ROOTPATH}/src/import/chips/p9/utils/imageProcs
 EXTRAINCDIR += ${ROOTPATH}/src/import/chips/p9/procedures/hwp/ffdc
 EXTRAINCDIR += ${ROOTPATH}/src/import/chips/p9/procedures/hwp/perv
+EXTRAINCDIR += ${ROOTPATH}/src/import/chips/p9/procedures/hwp/lib
 
 EXTRAINCDIR += ${PROCEDURES_PATH}/hwp/sbe/
 
@@ -55,8 +56,16 @@ OBJS += sbe_attn.o
 OBJS += sbe_retry_handler.o
 
 VPATH += ${ROOTPATH}/src/import/chips/p9/procedures/hwp/perv/
+VPATH += ${ROOTPATH}/src/import/chips/p9/procedures/hwp/lib/
+
 include ${ROOTPATH}/procedure.rules.mk
-include ${ROOTPATH}/src/import/chips/p9/procedures/hwp/perv/p9_extract_sbe_rc.mk
+
+#Not using the ekb mk file because it includes extra files
+# that we already include in libfapi2:
+# - p9_ppe_utils.o
+#include ${ROOTPATH}/src/import/chips/p9/procedures/hwp/perv/p9_extract_sbe_rc.mk
+OBJS += p9_extract_sbe_rc.o
+OBJS += p9_ppe_common.o
 
 SUBDIRS += test.d
 SUBDIRS += runtime.d
