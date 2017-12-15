@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2015,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2015,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -187,7 +187,7 @@ fapi2::ReturnCode enable_zctl( const fapi2::Target<TARGET_TYPE_MCBIST>& i_target
         });
 
         FAPI_ASSERT(l_poll,
-                    fapi2::MSS_ZCNTL_FAILED_TO_COMPLETE().set_MCA_IN_ERROR(p),
+                    fapi2::MSS_ZCNTL_FAILED_TO_COMPLETE().set_MCA_IN_ERROR(p).set_MCBIST_TARGET(i_target),
                     "zctl enable failed: %s", mss::c_str(p));
     }
 
