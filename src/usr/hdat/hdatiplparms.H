@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2016,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2016,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -295,11 +295,11 @@ const hdatIplpFeatureFlagSetting_t hdatIplpFeatureFlagSettingsArray_21[]=
 {
 {"tm-suspend-mode",                             0x0000000000000000},
 {"inst-thread-reconfig-control-trig0-1",        0x8000000000000000},
-{"inst-l1d-flush-trig2",                        0x8000000000000000},
+{"inst-l1d-flush-trig2",                        0x0000000000000000},
 {"inst-l1d-flush-ori30,30,0",                   0x0000000000000000},
 {"inst-spec-barrier-ori31,31,0",                0x8000000000000000},
-{"needs-l1d-flush-msr-hv-1-to-0",               0x8000000000000000},
-{"needs-l1d-flush-msr-pr-0-to-1",               0x8000000000000000},
+{"needs-l1d-flush-msr-hv-1-to-0",               0x0000000000000000},
+{"needs-l1d-flush-msr-pr-0-to-1",               0x0000000000000000},
 {"needs-spec-barrier-for-bound-checks",         0x8000000000000000},
 {"fw-l1d-thread-split",                         0x8000000000000000},
 {"fw-bcctrl-serialized",                        0x0000000000000000},
