@@ -72,6 +72,13 @@ enum PM_GPE_OCCFLG_DEFS
     REQUEST_OCC_SAFE_STATE                  = 31
 };
 
+//Enum form of OCC FLAG2.
+enum PM_GPE_OCCFLG2_DEFS
+{
+    PM_CALLOUT_ACTIVE                       = 28,
+    STOP_RECOVERY_TRIGGER_ENABLE            = 29
+};
+
 //
 //Enum form of OCC SCRATCH2.
 //
