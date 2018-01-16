@@ -6,7 +6,7 @@
 #
 # OpenPOWER HostBoot Project
 #
-# Contributors Listed Below - COPYRIGHT 2011,2017
+# Contributors Listed Below - COPYRIGHT 2011,2018
 # [+] International Business Machines Corp.
 #
 #
@@ -35,3 +35,30 @@
 #echo "WSALIAS DEFAULT FIPSLEVEL env/gfwb/simics-4.2.0/simics-4.2.83/fips/fld36/fi120201a700.42" >> $sb/simu/data/simicsInfo
 #echo "WSALIAS DEFAULT SIMICSLEVEL env/vtechb/simics-4.2.0/simics-4.2.83/bin" >> $sb/simu/data/simicsInfo
 
+# ------ Begin workaround for MVPD DD2.0, Simics Nimbus ---------
+#
+# Added workaround in presimsetup to fix fail Simics HB CI stand-alone
+# (release-op910) when PSTATE HWP requires DD2.0 VPD level (See commit 52724/)
+#    - Must use P9n DD2.0 MVPD to statisfy new pstate values for HWP check.
+#    - Update P9_NIMBUS.config to DD2.0
+#    - Use SBE SEEPROM DD2 image
+# Note: This works in conjunction with workarounds in postsimsetup.
+#
+
+# Grab a version of the ipl build tool which will work with TOR
+mkdir $sb/../obj/ppc/hwsv/server/buildhwpfimport/hwpf2/tools/x86_binaries -p
+cp /gsa/rchgsa/home/c/r/crgeddes/documents/hbBuild/p9_ipl_build $sb/../obj/ppc/hwsv/server/buildhwpfimport/hwpf2/tools/x86_binaries/
+
+# Need to build the SbePartition here so that it will be used when making the pnor image.
+# Failure to so causes the sbe image from the backing build to be used instead
+# Need the href image too..
+# Pull in href tor
+sbex -t 1035576
+
+echo "Grab tor sbe image"
+mkdir -p  $sb/sbei/sbfw/img/
+cp  /esw/fips910/Builds/b1107a_1746.910/src/sbei/sbfw/img/* $sb/sbei/sbfw/img/
+
+cd $sb/sbei/sbfw/ && mk -a
+cd -
+# ------ End workaround for MVPD DD2.0, Simics Nimbus ---------

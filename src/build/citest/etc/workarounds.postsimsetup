@@ -6,7 +6,7 @@
 #
 # OpenPOWER HostBoot Project
 #
-# Contributors Listed Below - COPYRIGHT 2011,2017
+# Contributors Listed Below - COPYRIGHT 2011,2018
 # [+] International Business Machines Corp.
 #
 #
@@ -33,28 +33,32 @@
 #cp $BACKING_BUILD/src/simu/data/cec-chip/base_cec_chip_file $sb/simu/data/cec-chip
 #patch -p0 $sb/simu/data/cec-chip/base_cec_chip_file $PROJECT_ROOT/src/build/citest/etc/patches/my_patch_File
 
+# Remove all Cumulus workarounds, they shouldn't be in Nimbus simics.
 
-#changes needed for Cumulus
-#@TODO RTC:178949
-echo "Applying SIMICS workaround to support Cumulus"
-sbex -t 1031560
-cd $sb/simu
-mk -a
+# ------ Begin workaround for MVPD DD2.0, Simics Nimbus ---------
+#
+# Added workaround in presimsetup to fix fail Simics HB CI stand-alone
+# (release-op910) when PSTATE HWP requires DD2.0 VPD level (See commit 52724/)
+#    - Must use P9n DD2.0 MVPD to statisfy new pstate values for HWP check.
+#    - Update P9_NIMBUS.config to DD2.0
+#    - Use SBE SEEPROM DD2 image
+# Note:
+#   - This works in conjunction with workarounds in presimsetup.
+#   - We can't update bbuild from b0930a_1740.910 to any newer fips910
+#     Backing build level that contains DD2.0 because of error when
+#     doing hb prime --test (probably related to Secure boot in later driver)
+#
 
-echo "Copying centaur and p9c action files"
-sbex -t 1032952
-sbex -t 1033805
+# Update P9_NIMBUS.config to DD2.0
+echo "Applying MVPD DD2 workarounds"
+sbex -t 1034628
 
-#pull in href tor
-sbex -t 1035576
-#pull in hwsv tor
+# Pull in hwsv TOR
 sbex -t 1034144
 
+# Change permissions on the files, we will need to overwrite them with
+# hb prime
+cd $sb/../obj/
+find . -name  "*temp_hw_ref_image.bin.save" | xargs -n 1 chmod 777
 
-mkdir $sb/../obj/ppc/hwsv/server/buildhwpfimport/hwpf2/tools/x86_binaries -p
-cp /gsa/rchgsa/home/c/r/crgeddes/documents/hbBuild/p9_ipl_build $sb/../obj/ppc/hwsv/server/buildhwpfimport/hwpf2/tools/x86_binaries/
-
-
-
-
-
+# ------ End workaround for MVPD DD2.0, Simics Nimbus ---------
