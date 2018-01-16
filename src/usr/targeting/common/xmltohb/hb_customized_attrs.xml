@@ -5,7 +5,7 @@
 <!--                                                                        -->
 <!-- OpenPOWER HostBoot Project                                             -->
 <!--                                                                        -->
-<!-- Contributors Listed Below - COPYRIGHT 2017                             -->
+<!-- Contributors Listed Below - COPYRIGHT 2017,2018                        -->
 <!-- [+] International Business Machines Corp.                              -->
 <!--                                                                        -->
 <!--                                                                        -->
@@ -631,6 +631,11 @@
         <id>ATTR_MSS_MRW_MEMDIAGS_BCMODE</id>
         <default>0x1</default>
         <no_export/>
+    </attribute>
+
+    <attribute>
+        <id>ATTR_FABRIC_PRESENT_GROUPS</id>
+        <writeable/>
     </attribute>
     <!-- =====================================================================
      End of customizations definitions
