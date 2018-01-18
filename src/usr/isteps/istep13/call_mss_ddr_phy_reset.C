@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2015,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2015,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -42,6 +42,8 @@
 #include <fapi2/plat_hwp_invoker.H>
 #include <p9_mss_ddr_phy_reset.H>
 #include <p9c_mss_ddr_phy_reset.H>
+
+#include <util/misc.H>
 
 using   namespace   ERRORLOG;
 using   namespace   ISTEP;
@@ -80,18 +82,30 @@ void* call_mss_ddr_phy_reset (void *io_pArgs)
 
         if (l_err)
         {
-            TRACFCOMP(ISTEPS_TRACE::g_trac_isteps_trace,
-                    "ERROR 0x%.8X: p9_mss_ddr_phy_reset HWP returns error",
-                    l_err->reasonCode());
+            if(!Util::isSimicsRunning())
+            {
+                TRACFCOMP(ISTEPS_TRACE::g_trac_isteps_trace,
+                        "ERROR 0x%.8X: p9_mss_ddr_phy_reset HWP returns error",
+                        l_err->reasonCode());
 
-            // capture the target data in the elog
-            ErrlUserDetailsTarget(l_mcbist_target).addToLog( l_err );
+                // capture the target data in the elog
+                ErrlUserDetailsTarget(l_mcbist_target).addToLog( l_err );
 
-            // Create IStep error log and cross reference to error that occurred
-            l_stepError.addErrorDetails( l_err );
+                // Create IStep error log and cross reference to error that
+                // occurred
+                l_stepError.addErrorDetails( l_err );
 
-            // Commit Error
-            errlCommit( l_err, HWPF_COMP_ID );
+                // Commit Error
+                errlCommit( l_err, HWPF_COMP_ID );
+            }
+            // Ignore the error returned from the above HWP if we're running
+            // simics in release-op910 branch. Remove this workaround when the
+            // backing build in release-op910 branch is updated past b1109a
+            else
+            {
+                delete l_err;
+                l_err = NULL;
+            }
         }
         else
         {
