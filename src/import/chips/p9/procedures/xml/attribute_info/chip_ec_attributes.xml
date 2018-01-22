@@ -82,11 +82,12 @@
   </attribute>
   <!-- ********************************************************************* -->
   <attribute>
-    <id>ATTR_CHIP_EC_FEATURE_HW417233</id>
-    <targetType>TARGET_TYPE_PROC_CHIP, TARGET_TYPE_PROC_CHIP</targetType>
+    <id>ATTR_CHIP_EC_FEATURE_SERIALIZE_INDIRECT_BRANCHES</id>
+    <targetType>TARGET_TYPE_PROC_CHIP</targetType>
     <description>
-      Nimbus DD1, DD2.0, DD2.1, Cumulus DD1 only:
-      HW417233 - Copy paste lsu bug
+      Nimbus DD2.0/DD2.1:
+       - Serialize bclr[l] with BH=1 when PR=0
+       - Serialize bcctr[l], bctar[l] when PR=0
     </description>
     <chipEcFeature>
       <chip>
@@ -96,16 +97,8 @@
           <test>LESS_THAN_OR_EQUAL</test>
         </ec>
       </chip>
-      <chip>
-        <name>ENUM_ATTR_NAME_CUMULUS</name>
-        <ec>
-          <value>0x10</value>
-          <test>LESS_THAN_OR_EQUAL</test>
-        </ec>
-      </chip>
     </chipEcFeature>
   </attribute>
-
   <!-- ********************************************************************* -->
   <attribute>
     <id>ATTR_CHIP_EC_FEATURE_P9_NO_NDL_IOVALID</id>
