@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2016,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2016,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -536,25 +536,61 @@ static errlHndl_t hdatGetPortInfo(HDAT::hdatHDIFDataArray_t &o_portArrayHdr,
 static void hdatGetFeatureFlagArray(const hdatIplpFeatureFlagSetting_t * o_featureFlagArr[],
                                     uint32_t & o_size)
 {
+    TARGETING::Target *l_pSysTarget = NULL;
+    (void) TARGETING::targetService().getTopLevelTarget(l_pSysTarget);
+
+    if(l_pSysTarget == NULL)
+    {
+        HDAT_ERR("hdatGetSystemParamters::Top Level Target not found");
+        assert(l_pSysTarget != NULL);
+    }
+
+    uint32_t l_risk = l_pSysTarget->getAttr<ATTR_RISK_LEVEL>();
+
     //Default to Nimbus DD2.2 settings (DD1.0 doesn't matter) and these are current
     //settings for cumulus
-    *o_featureFlagArr = hdatIplpFeatureFlagSettingsArray_22;
-    o_size = sizeof(hdatIplpFeatureFlagSettingsArray_22);
+    if(l_risk)
+    {
+        *o_featureFlagArr = hdatIplpFeatureFlagSettingsArray_22_risk100;
+        o_size = sizeof(hdatIplpFeatureFlagSettingsArray_22_risk100);
+    }
+    else
+    {
+        *o_featureFlagArr = hdatIplpFeatureFlagSettingsArray_22;
+        o_size = sizeof(hdatIplpFeatureFlagSettingsArray_22);
+    }
 
     //Modify for Nimubs DD2.0 and DD2.1
+    //Note that depending on risk level a different table is used
     PVR_t l_pvr( mmio_pvr_read() & 0xFFFFFFFF );
     if(l_pvr.chipType == PVR_t::NIMBUS_CHIP)
     {
         if(l_pvr.getDDLevel() == 0x20)
         {
-            *o_featureFlagArr = hdatIplpFeatureFlagSettingsArray_20;
-            o_size = sizeof(hdatIplpFeatureFlagSettingsArray_20);
+            if(l_risk)
+            {
+                *o_featureFlagArr = hdatIplpFeatureFlagSettingsArray_20_risk100;
+                o_size = sizeof(hdatIplpFeatureFlagSettingsArray_20_risk100);
+            }
+            else
+            {
+                *o_featureFlagArr = hdatIplpFeatureFlagSettingsArray_20;
+                o_size = sizeof(hdatIplpFeatureFlagSettingsArray_20);
+            }
 
         }
         else if (l_pvr.getDDLevel() == 0x21)
         {
-            *o_featureFlagArr = hdatIplpFeatureFlagSettingsArray_21;
-            o_size = sizeof(hdatIplpFeatureFlagSettingsArray_21);
+            if(l_risk)
+            {
+                *o_featureFlagArr = hdatIplpFeatureFlagSettingsArray_21_risk100;
+                o_size = sizeof(hdatIplpFeatureFlagSettingsArray_21_risk100);
+            }
+            else
+            {
+                *o_featureFlagArr = hdatIplpFeatureFlagSettingsArray_21;
+                o_size = sizeof(hdatIplpFeatureFlagSettingsArray_21);
+            }
 
         }
     }
