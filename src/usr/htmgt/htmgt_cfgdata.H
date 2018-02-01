@@ -274,11 +274,15 @@ namespace HTMGT
                             uint64_t & o_size);
 
     /**
-     * Determine if WOF is supported and if so return frequencies
+     * Determine if WOF is supported and return applicable frequencies
+     * @param[out] nominal Nominal frequency in MHz
      * @param[out] turbo   Turbo frequency in MHz (0 = no support)
      * @param[out] ultra   Ultra Turbo frequency in MHz (0 = no support)
+     * @return             TRUE if WOF is supported, else FALSE
      */
-    bool check_wof_support(uint16_t & turbo, uint16_t & ultra);
+    bool check_wof_support(uint16_t & nominal,
+                           uint16_t & turbo,
+                           uint16_t & ultra);
 
     /**
      * Fill specified buffer with requested config format data
