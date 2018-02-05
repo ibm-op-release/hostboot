@@ -96,8 +96,7 @@ enum PM_GPE_OCC_SCRATCH2_DEFS
     PM_DEBUG_HALT_ENABLE                    = 15,
     CORE_THROTTLE_CONTINUOUS_CHANGE_ENABLE  = 16,
     PGPE_OP_TRACE_DISABLE                   = 24,
-    PGPE_OP_TRACE_MEM_MODE_START            = 25,
-    PGPE_OP_TRACE_MEM_MODE_LENGTH           = 2
+    PGPE_OP_TRACE_MEM_MODE                  = 25
 };
 
 //
@@ -118,6 +117,7 @@ enum PM_CME_FLAGS_DEFS
     CME_FLAGS_STOP_BLOCK_ENTRY_C0           = 10,
     CME_FLAGS_STOP_BLOCK_ENTRY_C1           = 11,
     CME_FLAGS_CORE_QUIESCE_ACTIVE           = 12,
+    CME_FLAGS_PM_DEBUG_HALT_ENABLE          = 13,
     CME_FLAGS_WAIT_ON_PSTATE_START          = 14,
     CME_FLAGS_PSTATES_ENABLED               = 24,
     CME_FLAGS_FREQ_UPDT_DISABLE             = 25,
