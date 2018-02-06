@@ -588,6 +588,12 @@
           <no_export/>
     </attribute>
 
+    <!-- HB always reads the data from the scratch reg and sets it -->
+    <attribute>
+          <id>ATTR_RISK_LEVEL</id>
+          <persistency>volatile-zeroed</persistency>
+    </attribute>
+
     <attribute><id>ATTR_CEN_MSS_ALLOW_SINGLE_PORT</id><default>FALSE</default></attribute>
     <attribute><id>ATTR_CEN_VPD_DIMM_RCD_OUTPUT_TIMING</id><default>0x01,0x00,0x01,0x00</default></attribute>
 
