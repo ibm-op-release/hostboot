@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2015,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2015,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -80,7 +80,6 @@ HCD_CONST(TWO_MB,                               (2 * 1024 * 1024))
 
 HCD_CONST(CME_SRAM_SIZE,                        (32 * ONE_KB))
 HCD_CONST(OCC_SRAM_SIZE,                        (768 * ONE_KB))
-HCD_CONST(PGPE_IMAGE_SIZE,                      (44 * ONE_KB))
 
 HCD_CONST(HOMER_MEMORY_SIZE,                    (4 * ONE_MB))
 HCD_CONST(HOMER_OPMR_REGION_NUM,                0)
@@ -478,13 +477,12 @@ HCD_CONST(PGPE_BOOT_LOADER_RESET_ADDR_VAL,      0x40)
 HCD_CONST(PGPE_INSTRUMENTATION_SIZE,            (2 * ONE_KB))
 
 /// PGPE Image
-
-HCD_CONST(PGPE_AUX_TASK_SIZE,                   (2 * ONE_KB))
 HCD_CONST(PGPE_IMAGE_PPMR_OFFSET,
           (PGPE_BOOT_LOADER_PPMR_OFFSET + PGPE_BOOT_LOADER_SIZE))
-HCD_CONST(PGPE_HCODE_SIZE,                     (40 * ONE_KB)) // PGPE Img + GPPB
+
 HCD_CONST(PGPE_INT_VECTOR_SIZE,                 384)
 HCD_CONST(PGPE_HCODE_RESET_ADDR_VAL,            0x40)
+HCD_CONST(PGPE_DBG_PTR_AREA_SIZE,               64)
 
 /// PGPE Header
 
@@ -533,18 +531,32 @@ HCD_CONST(PGPE_FLAG_PHANTOM_HALT_ENABLE,        0x0001)
 
 /// PGPE Hcode
 
-//HCD_CONST(PGPE_HCODE_SIZE,                      (32 * ONE_KB)) //RTC158543
-HCD_CONST(PGPE_DBG_PTR_AREA_SIZE,               64)
-HCD_CONST(PGPE_GLOBAL_PSTATE_PARAM_BLOCK_SIZE,  (4 * ONE_KB))
+HCD_CONST(PGPE_GLOBAL_PSTATE_PARAM_BLOCK_SIZE,  (2 * ONE_KB))
+HCD_CONST(PGPE_AUX_TASK_SIZE,                   (2 * ONE_KB))
+
+// @todo RTC: 187758 The following is presently hardcoded in PGPE Hcode as
+// OCC_SHARED_SRAM_ADDR_LENGTH 2*1024.  This should be consolodated
+// between platforms in a future release.
+HCD_CONST(PGPE_OCC_SHARED_SRAM_SIZE,            (2 * ONE_KB))
+
+// @todo RTC: 187760 PGPE_IMAGE_SIZE really should use OCC_SRAM_PGPE_REGION_SIZE from
+// p9_hcd_memmap_occ_sram.H.  However, this creates a circular dependency.
+// where rearrangement is presently prohibitive (OP9010, FIPS910).
+HCD_CONST(PGPE_IMAGE_SIZE,                      ((48 * ONE_KB) -
+          PGPE_AUX_TASK_SIZE -
+          PGPE_OCC_SHARED_SRAM_SIZE))
+
+HCD_CONST(PGPE_HCODE_SIZE,                      (PGPE_IMAGE_SIZE -
+          PGPE_GLOBAL_PSTATE_PARAM_BLOCK_SIZE))
 
 /// Pstate Parameter Block + Pstate Table
 
 HCD_CONST(OCC_PSTATE_PARAM_BLOCK_PPMR_OFFSET,   (128 * ONE_KB))
-HCD_CONST(OCC_PSTATE_PARAM_BLOCK_SIZE,          (8 * ONE_KB))
+HCD_CONST(OCC_PSTATE_PARAM_BLOCK_SIZE,          (8 * ONE_KB))   // this is over allocated
 HCD_CONST(OCC_PSTATE_PARAM_BLOCK_REGION_SIZE,   (16 * ONE_KB))
 
 HCD_CONST(PGPE_PSTATE_OUTPUT_TABLES_PPMR_OFFSET, (144 * ONE_KB))
-HCD_CONST(PGPE_PSTATE_OUTPUT_TABLES_SIZE,       (8 * ONE_KB))
+HCD_CONST(PGPE_PSTATE_OUTPUT_TABLES_SIZE,       (8 * ONE_KB))   // this is over allocated
 HCD_CONST(PGPE_PSTATE_OUTPUT_TABLES_REGION_SIZE, (16 * ONE_KB))
 
 HCD_CONST(OCC_WOF_TABLES_PPMR_OFFSET,           (768 * ONE_KB))
