@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2013,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2013,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -44,6 +44,8 @@ uint8_t ErrlManager::iv_hiddenErrLogsEnable =
             TARGETING::HIDDEN_ERRLOGS_ENABLE_ALLOW_ALL_LOGS;
 
 extern trace_desc_t* g_trac_errl;
+
+
 
 //////////////////////////////////////////////////////////////////////////////
 // Local functions
@@ -357,3 +359,26 @@ bool rt_processCallout(errlHndl_t &io_errl,
 }
 
 } // End namespace
+
+
+//------------------------------------------------------------------------
+void initErrlManager(void)
+{
+    // Note: rtPnor needs to be setup before this is called
+    // call errlManager ctor so that we're ready and waiting for errors.
+    ERRORLOG::theErrlManager::instance();
+}
+
+
+struct registerInitErrlManager
+{
+    registerInitErrlManager()
+    {
+        // Register interface for Host to call
+        postInitCalls_t * rt_post = getPostInitCalls();
+        rt_post->callInitErrlManager = &initErrlManager;
+    }
+};
+
+registerInitErrlManager g_registerInitErrlManager;
+
