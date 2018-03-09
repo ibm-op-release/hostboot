@@ -109,12 +109,10 @@ actionclass sbe_vital_attn
     funccall("handleSbeVital");
 };
 
-/** Used for NVLINK errors (open power)
- *  which can be the cause of OPAL TIs
- */
-actionclass nvLinkAssist
+/** Special wrapper for NPU0FIR to collect extra FFDC */
+actionclass analyzeNPU0FIR
 {
-    capture(nvLinkErr);
-    self_th_1;
+    capture(npu0fir_ffdc);
+    analyze(gNPU0FIR);
 };
 
