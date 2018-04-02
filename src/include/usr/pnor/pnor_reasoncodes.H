@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2011,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2011,2018                        */
 /* [+] Google Inc.                                                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
@@ -178,6 +178,7 @@ namespace PNOR
         RC_MBOX_BAD_SEQUENCE         = PNOR_COMP_ID | 0x32,
         RC_MBOX_ERROR_STATUS         = PNOR_COMP_ID | 0x33,
         RC_UNSIGNED_PNOR_SECTION     = PNOR_COMP_ID | 0x34,
+        RC_READ_ONLY_PERM_FAIL       = PNOR_COMP_ID | 0x35,
 
         //@fixme-RTC:131607-Temporary value to allow HWSV compile
         //termination_rc

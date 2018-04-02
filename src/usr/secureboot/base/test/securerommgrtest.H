@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2013,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2013,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -363,6 +363,16 @@ class SecureRomManagerTest : public CxxTest::TestSuite
                                - VFS::VfsRp::getInstance().iv_unprotectedOffset
                                + l_vaddr;
         memcpy(l_originPage, reinterpret_cast<uint8_t*>(l_pnorVaddr), PAGESIZE);
+        // Open the write permissions to allow the test to temporarily corrupt
+        // the partition.
+        int l_rc = mm_set_permission(reinterpret_cast<void*>(l_pnorVaddr),
+                                     2*PAGESIZE,
+                                     WRITABLE);
+        if(l_rc)
+        {
+            TS_FAIL("mm_set_permission: Cannot set permissions to write");
+            break;
+        }
 
         // Corrupt page
         uint8_t l_corruptByte = 0xFF;
@@ -382,6 +392,16 @@ class SecureRomManagerTest : public CxxTest::TestSuite
         }
         delete l_errl;
         l_errl = nullptr;
+
+        // Reset to read-only permissions.
+        l_rc = mm_set_permission(reinterpret_cast<void*>(l_pnorVaddr),
+                                     2*PAGESIZE,
+                                     READ_ONLY);
+        if(l_rc)
+        {
+            TS_FAIL("mm_set_permission: Cannot reset permissions to read only");
+            break;
+        }
 
         } while(0);
 
