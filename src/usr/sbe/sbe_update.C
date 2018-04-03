@@ -35,6 +35,7 @@
 #include <targeting/common/utilFilter.H>
 #include <targeting/common/targetservice.H>
 #include <targeting/common/target.H>
+#include <attributeenums.H>
 #include <util/align.H>
 #include <util/crc32.H>
 #include <util/misc.H>
@@ -102,6 +103,8 @@ static bool g_mbox_query_done   = false;
 static bool g_mbox_query_result = false;
 static bool g_istep_mode        = false;
 static bool g_update_both_sides = false;
+// g_options tracks main function updateProcessorSbeSeeproms()'s i_options
+static SBE::sbeUpdateProcOptions g_options = SBE::SBE_UPDATE_PROC_ALL;
 
 // ----------------------------------------
 // Global Variables HW Keys Hash Transition
@@ -113,7 +116,8 @@ using namespace TARGETING;
 
 namespace SBE
 {
-    errlHndl_t updateProcessorSbeSeeproms()
+    errlHndl_t updateProcessorSbeSeeproms(
+        const sbeUpdateProcOptions i_options)
     {
         errlHndl_t err = NULL;
         errlHndl_t err_cleanup = NULL;
@@ -123,8 +127,9 @@ namespace SBE
         bool l_cleanupVmmSpace = false;
         bool l_restartNeeded   = false;
 
-        TRACUCOMP( g_trac_sbe,
-                   ENTER_MRK"updateProcessorSbeSeeproms()");
+        g_options = i_options;
+        TRACFCOMP( g_trac_sbe,ENTER_MRK
+                   "updateProcessorSbeSeeproms(): i_options=0x%X", i_options);
 
         do{
 
@@ -190,6 +195,14 @@ namespace SBE
             {
                 TRACFCOMP(g_trac_sbe,
                             INFO_MRK"Update Both Sides of SBE Flag Indicated.");
+                g_update_both_sides = true;
+            }
+
+            if (g_options == SBE_UPDATE_ONLY_SLAVE_PROCS)
+            {
+               TRACFCOMP(g_trac_sbe,
+                         INFO_MRK"Update Both Sides of SBE due to "
+                         "g_options = %d", g_options);
                 g_update_both_sides = true;
             }
 
@@ -293,6 +306,14 @@ namespace SBE
                               " (i=%d)",
                               TARGETING::get_huid(sbeState.target), i);
                     sbeState.target_is_master = true;
+
+                    if (i_options == SBE_UPDATE_ONLY_SLAVE_PROCS)
+                    {
+                        TRACFCOMP(g_trac_sbe,"Skipping update on Master Proc "
+                                  "due to i_options=0x%X", i_options);
+                        continue;
+                    }
+
                 }
                 else
                 {
@@ -305,7 +326,8 @@ namespace SBE
                 TARGETING::ScomSwitches scomSetting =
                       sbeState.target->getAttr<TARGETING::ATTR_SCOM_SWITCHES>();
 
-                if(!(scomSetting.useXscom))
+                if(!(scomSetting.useXscom) &&
+                    (i_options != SBE_UPDATE_ONLY_SLAVE_PROCS))
                 {
                     //Xscom is not viable on this chip, thus powerbus isn't
                     //up to chip -- skip it
@@ -461,11 +483,14 @@ namespace SBE
             /**************************************************************/
             /*  Perform System Operation                                  */
             /**************************************************************/
-
-            // Restart IPL if SBE Update requires it or key transition occurred
-            if (   (l_restartNeeded == true)
-                || (g_do_hw_keys_hash_transition))
+            // Restart IPL if SBE Update requires it or key transition occurred.
+            // However, skip restart if only updating Slave Processors
+            if ((   (l_restartNeeded == true)
+                 || (g_do_hw_keys_hash_transition))
+                 && (g_options != SBE_UPDATE_ONLY_SLAVE_PROCS)
+               )
             {
+
                 TRACFCOMP( g_trac_sbe,
                            INFO_MRK"updateProcessorSbeSeeproms(): Restart "
                            "Needed (%d). Calling preReIplCheck()",
@@ -492,12 +517,14 @@ namespace SBE
                     break;
                 }
             }
-            else
+            // Skip version comparison if only updating Slave SBE Seeproms
+            else if (i_options != SBE_UPDATE_ONLY_SLAVE_PROCS)
             {
                 /************************************************************/
                 /* Deconfigure any Processors that have a Version different */
                 /*   from the Master Processor's Version                    */
                 /************************************************************/
+
                 err = masterVersionCompare(sbeStates_vector);
 
                 if ( err )
@@ -508,6 +535,13 @@ namespace SBE
                                "masterVersionCompare() failed rc=0x%.4X",
                                err->reasonCode());
                 }
+            }
+            else
+            {
+                TRACFCOMP( g_trac_sbe,
+                           INFO_MRK"updateProcessorSbeSeeproms(): Skipping "
+                           "all re-IPLs and checks because only udpating "
+                           "slave processors at this time");
             }
 
         }while(0);
@@ -544,8 +578,9 @@ namespace SBE
             }
         }
 
-        TRACUCOMP( g_trac_sbe,
-                   EXIT_MRK"updateProcessorSbeSeeproms()" );
+        TRACFCOMP( g_trac_sbe,EXIT_MRK
+                   "updateProcessorSbeSeeproms(): err plid=0x%.8X, rc=0x%.4X",
+                   ERRL_GETPLID_SAFE(err), ERRL_GETRC_SAFE(err) );
 
         return err;
     }
@@ -1712,7 +1747,7 @@ namespace SBE
                            ERRL_GETPLID_SAFE(err));
                 break;
             }
-            
+
             bool l_bootSide0 = (l_bootside == SBE_SEEPROM0);
 
             TRACFCOMP( g_trac_sbe,INFO_MRK"updateSbeBootSeeprom(): set SBE boot side %d for proc=%.8X",
@@ -1720,6 +1755,63 @@ namespace SBE
                        TARGETING::get_huid(i_target) );
 
 #endif
+
+            // Check attributes for special case where after forcing
+            // SBE Updates via FSI to Slave Processors this attribute keeps
+            // track of failures
+            auto status = i_target->getAttr<
+                            ATTR_SBE_UPDATE_STATUS_PER_PROC>();
+            // Handle each case
+            switch ( status )
+            {
+                case ( SBE_UPDATE_STATUS_BOTH_SBE_UPDATES_FAILED ) :
+
+                    TRACFCOMP( g_trac_sbe, INFO_MRK"updateSbeBootSeeprom: "
+                               "tgt=0x%X: update status=%d. With both SBE "
+                               "Seeproms failing to update on this target we "
+                               "shouldn't have gotten here. Continue on though "
+                               "as this processor should eventually be "
+                               "deconfigured",
+                               TARGETING::get_huid(i_target), status);
+
+                    break;
+
+                case ( SBE_UPDATE_STATUS_PRIMARY_SBE_UPDATE_FAILED ) :
+
+                    l_bootSide0 = false;
+
+                    TRACFCOMP( g_trac_sbe, INFO_MRK"updateSbeBootSeeprom: "
+                               "tgt=0x%X: update status=%d. Setting "
+                               "l_bootSide0 to false since SBE SEEPROM Primary "
+                               "failed to update",
+                               TARGETING::get_huid(i_target), status);
+
+                    break;
+
+               case ( SBE_UPDATE_STATUS_BACKUP_SBE_UPDATE_FAILED ) :
+
+                    l_bootSide0 = true;
+
+                    TRACFCOMP( g_trac_sbe, INFO_MRK"updateSbeBootSeeprom: "
+                               "tgt=0x%X: update status=%d. Setting "
+                               "l_bootSide0 to true since SBE SEEPROM BACKUP "
+                               "failed to update",
+                               TARGETING::get_huid(i_target), status);
+
+                    break;
+
+                case (SBE_UPDATE_STATUS_NO_ERRORS) :
+                    // fall through
+
+                default :
+
+                    TRACUCOMP( g_trac_sbe, INFO_MRK"updateSbeBootSeeprom: "
+                               "tgt=0x%X: update status=%d. No-op",
+                               TARGETING::get_huid(i_target), status);
+
+                    break;
+            }
+
 
             if(l_bootSide0)
             {
@@ -2632,6 +2724,7 @@ namespace SBE
             rc = mm_remove_pages(RELEASE,
                                  reinterpret_cast<void*>(SBE_ECC_IMG_VADDR),
                                  SBE_ECC_IMG_MAX_SIZE);
+
             if( rc )
             {
                 TRACFCOMP( g_trac_sbe, ERR_MRK"updateSeepromSide() - Error "
@@ -2704,15 +2797,16 @@ namespace SBE
             TRACDBIN(g_trac_sbe,"updateSeepromSide()-start of IMG - ECC",
                      reinterpret_cast<void*>(SBE_ECC_IMG_VADDR), 0x80);
 
-
             //Quiesce the SBE before writing current SBE
-            if ( ( ( io_sbeState.seeprom_side_to_update == EEPROM::SBE_PRIMARY )
+            if ((( ( io_sbeState.seeprom_side_to_update == EEPROM::SBE_PRIMARY )
                    &&
                    ( io_sbeState.cur_seeprom_side == SBE_SEEPROM0 ) )
                  ||
                  ( ( io_sbeState.seeprom_side_to_update == EEPROM::SBE_BACKUP )
                    &&
                    ( io_sbeState.cur_seeprom_side == SBE_SEEPROM1 ) ) )
+                && (g_options != SBE_UPDATE_ONLY_SLAVE_PROCS)
+               )
             {
                 err = SBEIO::sendPsuQuiesceSbe(io_sbeState.target);
 
@@ -2850,6 +2944,104 @@ namespace SBE
         }
 #endif
 
+#ifdef CONFIG_SBE_UPDATE_CONSECUTIVE
+        //If i_options indicated to update both sides of SBE
+        if (g_update_both_sides)
+        {
+            // Special error handling if both sides need to be updated
+            if ((err != nullptr) &&
+                (g_options == SBE_UPDATE_ONLY_SLAVE_PROCS))
+            {
+                // Record error in attribute
+                auto status = io_sbeState.target->getAttr<
+                                ATTR_SBE_UPDATE_STATUS_PER_PROC>();
+                const auto original_status = status;
+
+                if (io_sbeState.seeprom_side_to_update == EEPROM::SBE_PRIMARY)
+                {
+                    status |=
+                      SBE_UPDATE_STATUS_PRIMARY_SBE_UPDATE_FAILED;
+
+                    // Commit error log here to continue to try to update
+                    // the backup SBE
+                    TRACFCOMP(g_trac_sbe, "updateSeepromSide(): "
+                              "Inside CONSECUTIVE recursive check: "
+                              " Update to seeprom %d failed (err_rc=0x%04X). "
+                              "Update ATTR_SBE_UPDATE_STATUS_PER_PROC "
+                              "from %d to %d. Commit error (plid=0x%08X), "
+                              "but continue",
+                              io_sbeState.seeprom_side_to_update,
+                              ERRL_GETRC_SAFE(err),
+                              original_status, status,
+                              ERRL_GETPLID_SAFE(err));
+                    err->collectTrace(SBE_COMP_NAME);
+
+                    // Commit error log as it will never be used for the error
+                    // log to gard the processors below
+                    errlCommit(err, SBE_COMP_ID);
+                }
+                else
+                {
+                    status |=
+                      SBE_UPDATE_STATUS_BACKUP_SBE_UPDATE_FAILED;
+                    TRACFCOMP(g_trac_sbe, "updateSeepromSide(): "
+                              "Inside CONSECUTIVE recursive check: "
+                              " Update to seeprom %d failed (err_rc=0x%04X). "
+                              "Update ATTR_SBE_UPDATE_STATUS_PER_PROC "
+                              "from %d to %d",
+                              io_sbeState.seeprom_side_to_update,
+                              ERRL_GETRC_SAFE(err),
+                              original_status, status);
+                }
+                io_sbeState.target->setAttr<
+                  ATTR_SBE_UPDATE_STATUS_PER_PROC>(status);
+
+                // If both sides fail must gard out this processor
+                if (status ==
+                      SBE_UPDATE_STATUS_BOTH_SBE_UPDATES_FAILED)
+                {
+                    TRACFCOMP(g_trac_sbe, ERR_MRK"updateSeepromSide(): "
+                              "Unable to update either Slave Processor via FSI "
+                              "so must decoconfigure and gard proc HUID 0x%08X "
+                              "since cannot be trusted. Using err plid=0x%08X, "
+                              "rc=0x%04X",
+                              get_huid(io_sbeState.target),
+                              ERRL_GETPLID_SAFE(err),
+                              ERRL_GETRC_SAFE(err));
+
+                    err->collectTrace(SBE_COMP_NAME);
+
+                    err->addHwCallout( io_sbeState.target,
+                                       HWAS::SRCI_PRIORITY_HIGH,
+                                       HWAS::DECONFIG,
+                                       HWAS::GARD_Reconfig );
+                }
+
+                if (err)
+                {
+                    // Commit any log here to go down the official
+                    // SBE Update reboot path
+                    errlCommit(err, SBE_COMP_ID);
+                }
+
+            }
+
+            // Recursively call this function for the other SEEPROM
+            if ( ( err == nullptr ) &&
+                 ( io_sbeState.seeprom_side_to_update == EEPROM::SBE_PRIMARY ) )
+            {
+                io_sbeState.seeprom_side_to_update = EEPROM::SBE_BACKUP;
+                TRACFCOMP( g_trac_sbe, "updateSeepromSide(): "
+                           "i_options=%d requires both sides to be updated. "
+                           "Recursively calling itself: HUID=0x%.8X, side=%d",
+                           g_options, TARGETING::get_huid(io_sbeState.target),
+                           io_sbeState.seeprom_side_to_update);
+                 err = updateSeepromSide(io_sbeState);
+            }
+        }
+#endif
+
+
         return err;
     }
 
@@ -2874,6 +3066,7 @@ namespace SBE
         bool pnor_check_dirty     = false;
         bool crc_check_dirty      = false;
         bool isSimics_check       = false;
+        bool force_update         = false;
 
         TARGETING::Target * l_sys = nullptr;
 
@@ -2881,6 +3074,18 @@ namespace SBE
         uint8_t system_situation = 0x00;
 
         do{
+
+            // Force Update in special case where we are  udpating
+            // Slave Procs via FSI
+            if (g_options == SBE_UPDATE_ONLY_SLAVE_PROCS)
+            {
+                force_update = true;
+
+                TRACFCOMP( g_trac_sbe, INFO_MRK
+                           "getTargetUpdateActions(): HUID=0x%.8X: "
+                           "Forcing Update on Slave Procs via FSI",
+                           TARGETING::get_huid(io_sbeState.target));
+            }
 
             /**************************************************************/
             /*  Compare SEEPROM 0 with PNOR and Customized Image CRC --   */
@@ -2911,7 +3116,8 @@ namespace SBE
             }
 
             if ( ( pnor_check_dirty ||
-                   crc_check_dirty )
+                   crc_check_dirty ||
+                   force_update )
                  && !isSimics_check )
             {
                 seeprom_0_isDirty = true;
@@ -2920,12 +3126,12 @@ namespace SBE
 #endif
                 TRACFCOMP( g_trac_sbe, INFO_MRK"SBE Update tgt=0x%X: Seeprom0 "
                            "dirty: pnor=%d, crc=%d (custom=0x%X/s0=0x%X), "
-                           "isSimics=%d",
+                           "isSimics=%d, force_update=%d",
                            TARGETING::get_huid(io_sbeState.target),
                            pnor_check_dirty, crc_check_dirty,
                            io_sbeState.customizedImage_crc,
                            io_sbeState.seeprom_0_ver.data_crc,
-                           isSimics_check);
+                           isSimics_check, force_update);
             }
             else
             {
@@ -2973,7 +3179,8 @@ namespace SBE
             }
 
             if ( (pnor_check_dirty ||
-                  crc_check_dirty )
+                  crc_check_dirty ||
+                  force_update )
                  && !isSimics_check )
             {
                 seeprom_1_isDirty = true;
@@ -2982,12 +3189,12 @@ namespace SBE
 #endif
                 TRACFCOMP( g_trac_sbe, INFO_MRK"SBE Update tgt=0x%X: Seeprom1 "
                            "dirty: pnor=%d, crc=%d (custom=0x%X/s1=0x%X), "
-                           "isSimics=%d",
+                           "isSimics=%d, force_update=%d",
                            TARGETING::get_huid(io_sbeState.target),
                            pnor_check_dirty, crc_check_dirty,
                            io_sbeState.customizedImage_crc,
                            io_sbeState.seeprom_1_ver.data_crc,
-                           isSimics_check);
+                           isSimics_check, force_update);
             }
             else
             {
@@ -3619,6 +3826,7 @@ namespace SBE
 
 #elif CONFIG_SBE_UPDATE_CONSECUTIVE
             // Updating the SEEPROMs 1-at-a-time (OP systems)
+            // unless requested to update Slave Procs via FSI
 
             // Check system situation ignoring perm/temp bit
             switch ( i_system_situation )
@@ -4596,7 +4804,6 @@ namespace SBE
                     break;
                 }
             }
-
             // Handle very unlikely case of not finding Master Processor
             assert( (mP != UINT8_MAX),
                     "masterVersionCompare(): master processor not found");

@@ -47,6 +47,7 @@
         <default>0xFF</default>
     </attribute>
     <attribute><id>GPU_SENSORS</id></attribute>
+    <attribute><id>SBE_UPDATE_STATUS_PER_PROC</id></attribute>
 </targetTypeExtension>
 
 <targetTypeExtension>
@@ -102,6 +103,7 @@
     <attribute><id>VDD_CURRENT_OVERFLOW_WORKAROUND_ENABLE</id></attribute>
     <attribute><id>MAX_VDD_CURRENT_READING</id></attribute>
     <attribute><id>HTMGT_SAVED_POWER_LIMIT</id></attribute>
+    <attribute><id>PERFORMED_P9_FBC_EFF_CONFIG_EARLY</id></attribute>
 </targetTypeExtension>
 
 <targetTypeExtension>

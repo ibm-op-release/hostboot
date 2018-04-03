@@ -1354,5 +1354,70 @@ ID for the sensor number returned with the elog. -->
   <writeable/>
 </attribute>
 
+<attribute>
+   <id>PERFORMED_P9_FBC_EFF_CONFIG_EARLY</id>
+   <description>
+        Indicates if the P9_FBC_EFF_CONFIG HWP was called early in the IPL
+        (istep 8.1) such that it doesn't get called again later in the IPL.
+            0x00 = P9_FBC_EFF_CONFIG HWP was NOT called early in the IPL
+            0x01 = P9_FBC_EFF_CONFIG HWP was called early in the IPL
+    </description>
+    <simpleType>
+        <uint8_t>
+            <default>0x00</default>
+        </uint8_t>
+    </simpleType>
+    <persistency>volatile-zeroed</persistency>
+    <writeable/>
+    <readable/>
+</attribute>
+
+<enumerationType>
+  <description>
+      Enum for SBE_UPDATE_STATUS_PER_PROC attribute.
+      The 'both' SBE Seeproms value must be the ORed together values of the
+      SBE Primary and Backup values for the logic in sbe_update.C to work.
+  </description>
+  <enumerator>
+    <name>NO_ERRORS</name>
+    <value>0</value>
+  </enumerator>
+  <enumerator>
+    <name>PRIMARY_SBE_UPDATE_FAILED</name>
+    <value>1</value>
+  </enumerator>
+  <enumerator>
+    <name>BACKUP_SBE_UPDATE_FAILED</name>
+    <value>2</value>
+  </enumerator>
+  <enumerator>
+    <name>BOTH_SBE_UPDATES_FAILED</name>
+    <value>3</value>
+  </enumerator>
+  <id>SBE_UPDATE_STATUS</id>
+</enumerationType>
+
+
+
+<attribute>
+    <id>SBE_UPDATE_STATUS_PER_PROC</id>
+    <description>
+       Indicates if there were any fails when updating either the Primary
+       of Backup SBE Seeproms on a processor.  Will only be used for
+       slave processors.
+       Uses enum SBE_UPDATE_STATUS.
+       NOTE: Won't be updated for Master Processor - will remain default
+             value of 0x0 (NO_ERRORS)
+    </description>
+    <simpleType>
+        <uint8_t>
+            <default>0x00</default>
+        </uint8_t>
+    </simpleType>
+    <persistency>volatile-zeroed</persistency>
+    <writeable/>
+    <readable/>
+</attribute>
+
 
 </attributes>

@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2015,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2015,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -46,6 +46,8 @@
 #include <i2c/i2cif.H>
 #include <sbe/sbeif.H>
 #include <hwas/common/hwas.H>
+#include <secureboot/service.H>
+
 //  targeting support
 #include <targeting/common/commontargeting.H>
 #include <targeting/common/utilFilter.H>
@@ -63,6 +65,8 @@
 
 #include <p9_setup_sbe_config.H>
 #include <initservice/mboxRegs.H>
+#include <fapi2/plat_hwp_invoker.H>
+#include <p9_fbc_eff_config.H>
 
 using namespace ISTEP_ERROR;
 using namespace ERRORLOG;
@@ -80,12 +84,58 @@ void* call_host_slave_sbe_config(void *io_pArgs)
     TRACFCOMP( ISTEPS_TRACE::g_trac_isteps_trace,
              "call_host_slave_sbe_config entry" );
 
+    do
+    {
+    // Used in multiple places below
+    Target* l_sys = nullptr;
+    targetService().getTopLevelTarget(l_sys);
+    assert( l_sys, "call_host_slave_sbe_config system target is nullptr");
+
+    // Check to see if a special SBE Update needs to be performed on the
+    // Slave Processors for OpenPower Systems without security enabled
+    if ( !INITSERVICE::spBaseServicesEnabled() &&
+         !SECUREBOOT::enabled() )
+    {
+        TRACFCOMP( ISTEPS_TRACE::g_trac_isteps_trace,INFO_MRK
+                   "call_host_slave_sbe_config entry: "
+                   "call p9_fbc_eff_config HWP" );
+        FAPI_INVOKE_HWP(l_errl,p9_fbc_eff_config);
+        if(l_errl)
+        {
+            l_stepError.addErrorDetails(l_errl);
+            TRACFCOMP( ISTEPS_TRACE::g_trac_isteps_trace,
+                       "ERROR : call p9_fbc_eff_config, PLID=0x%x",
+                       l_errl->plid() );
+            errlCommit(l_errl, HWPF_COMP_ID);
+            break;
+        }
+        // Set attribute such that p9_fbc_eff_config will be skipped
+        // later in istep 8.6
+        l_sys->setAttr<ATTR_PERFORMED_P9_FBC_EFF_CONFIG_EARLY>(true);
+
+        TRACFCOMP( ISTEPS_TRACE::g_trac_isteps_trace,INFO_MRK
+                   "call_host_slave_sbe_config entry: force SBE Updates" );
+        l_errl = SBE::updateProcessorSbeSeeproms(
+                        SBE::SBE_UPDATE_ONLY_SLAVE_PROCS);
+        if( l_errl )
+        {
+            // Create IStep error log and cross ref error that occurred
+            l_stepError.addErrorDetails( l_errl );
+
+            TRACFCOMP( ISTEPS_TRACE::g_trac_isteps_trace,ERR_MRK
+                       "call_host_slave_sbe_config: call to "
+                       "SBE::updateProcessorSbeSeeproms failed: "
+                       "PLID=0x%.08X, RC=0x%.04X",
+                       l_errl->plid(), l_errl->reasonCode() );
+
+            // Commit Error
+            errlCommit( l_errl, ISTEP_COMP_ID );
+            break; // break out of do-while loop
+        }
+    }
+
     TARGETING::Target* l_pMasterProcTarget = NULL;
     TARGETING::targetService().masterProcChipTargetHandle(l_pMasterProcTarget);
-
-    TARGETING::Target* l_sys = NULL;
-    targetService().getTopLevelTarget(l_sys);
-    assert( l_sys != NULL );
 
     // Setup the boot flags attribute for the slaves based on the data
     //  from the master proc
@@ -132,6 +182,21 @@ void* call_host_slave_sbe_config(void *io_pArgs)
         // do not call HWP on master processor
         if (l_cpu_target != l_pMasterProcTarget)
         {
+
+            // Do not run on slave processor that has failed to have both of
+            // its SBE Seeproms udpated
+            auto status = l_cpu_target->getAttr<
+                            ATTR_SBE_UPDATE_STATUS_PER_PROC>();
+            if (status == SBE_UPDATE_STATUS_BOTH_SBE_UPDATES_FAILED)
+            {
+                TRACFCOMP(ISTEPS_TRACE::g_trac_isteps_trace,INFO_MRK
+                          "call_host_slave_sbe_config: "
+                          "Skipping seting up Slave Processor HUID 0x%08X "
+                          "since both SBE Seeproms failed to be updated",
+                          get_huid(l_cpu_target));
+                continue;
+            }
+
             const fapi2::Target<fapi2::TARGET_TYPE_PROC_CHIP>
                 l_fapi2_proc_target (l_cpu_target);
 
@@ -178,6 +243,8 @@ void* call_host_slave_sbe_config(void *io_pArgs)
             }
         }
     } // end of cycling through all processor chips
+
+    } while(0); // end of do-while
 
     TRACFCOMP( ISTEPS_TRACE::g_trac_isteps_trace,
              "call_host_slave_sbe_config exit" );

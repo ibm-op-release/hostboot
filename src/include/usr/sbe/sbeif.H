@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2013,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2013,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -61,33 +61,50 @@ namespace SBE
                              sbe_image_version_t* o_version = NULL);
 
     /**
+     * @enum sbeUpdateProcOptions_t
+     *
+     * @brief SBE Update Proc Options enum specifies which Processor targets
+     *        will be selected to go through the SBE Update process
+     *
+     */
+    enum sbeUpdateProcOptions
+    {
+        SBE_UPDATE_PROC_ALL           = 0,
+        SBE_UPDATE_ONLY_SLAVE_PROCS   = 1,
+    };
+
+    /**
      * @brief Iterates through all the functional processors and updates
      *        the SBE Image in a SEEPROM, if necessary.
      *
-     * @return errlHndl_t    Error log handle on failure.
+     * @param[in] i_options   enum specifying which processors should be
+     *                        targeted for the updates
+     *
+     * @return errlHndl_t     Error log handle on failure.
      */
-    errlHndl_t updateProcessorSbeSeeproms();
+    errlHndl_t updateProcessorSbeSeeproms(
+        sbeUpdateProcOptions i_options = SBE_UPDATE_PROC_ALL);
 
     /**
      * @brief Determines whether we are on the Golden side or not
      *
-     * @param[out] o_isGolden boolean, True if we are on Golden side, False
-     *                        otherwise.
+     * @param[out] o_isGolden   boolean, True if we are on Golden side,
+     *                          False otherwise.
      *
-     * @return errlHndl_t Error log handle on failure.
+     * @return errlHndl_t       Error log handle on failure.
      *
-     * NOTE: -Golden Side means we booted from the Golden Seeprom pointing
-     *        at the Golden side of PNOR.
-     *       -Using master processor to make this determination.
+     * NOTE: Golden Side means we booted from the Golden Seeprom pointing
+     *         at the Golden side of PNOR.
+     *       Using master processor to make this determination.
      */
     errlHndl_t isGoldenSide( bool & o_isGolden );
 
    /**
     * @brief Determines if we booted in synchronous memory mode or not
     *
-    * @param[out] o_mcSyncMode - The MC sync mode the system last booted with.
+    * @param[out] o_mcSyncMode   The MC sync mode the system last booted with.
     *
-    * @return errlHndl_t Error log handle on error.
+    * @return errlHndl_t         Error log handle on error.
     */
     errlHndl_t getBootMcSyncMode( uint8_t& o_mcSyncMode );
 
