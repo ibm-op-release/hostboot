@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2014,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2014,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -95,6 +95,19 @@ class RtPnor
          * @param[out] o_pnorInfo Information about PNOR.
          */
         errlHndl_t getPnorInfo( PNOR::PnorInfo_t& o_pnorInfo );
+
+
+        /**
+         * @brief  Has RtPnor::init() successfully completed?
+         * @return true if init() finished successfully, otherwise false
+         */
+        bool isPnorInitialized() { return iv_initialized; }
+
+        /**
+         * @brief  Sets private iv_initialized variable
+         *         (true = RtPnor::init() finished successfully)
+         */
+        void setInitialized(bool i_initialized);
 
     protected:
        /**
@@ -188,6 +201,9 @@ class RtPnor
 
         // Cached master Proc Id
         static uint64_t iv_masterProcId;
+
+        // is RT pnor initialized?
+        static bool iv_initialized;
 
         //allow testcases to see inside the class
         friend class PnorRtTest;
