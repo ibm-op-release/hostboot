@@ -276,97 +276,121 @@ struct hdatIplpFeatureFlagSetting_t
     uint64_t hdatIplpFeatureFlagSetting;    // bit0 indicates IPL time setting.
 }__attribute__ ((packed));
 
+
 // Agreed strings and settings of different feature flags
 const hdatIplpFeatureFlagSetting_t hdatIplpFeatureFlagSettingsArray_20[]=
+//RISK 0 (Kernel)
 {
-{"tm-suspend-mode",                             0x0000000000000000},
-{"inst-thread-reconfig-control-trig0-1",        0x0000000000000000},
-{"inst-l1d-flush-trig2",                        0x0000000000000000},
-{"inst-l1d-flush-ori30,30,0",                   0x0000000000000000},
-{"inst-spec-barrier-ori31,31,0",                0x8000000000000000},
-{"needs-l1d-flush-msr-hv-1-to-0",               0x8000000000000000},
-{"needs-l1d-flush-msr-pr-0-to-1",               0x8000000000000000},
-{"needs-spec-barrier-for-bound-checks",         0x8000000000000000},
-{"fw-l1d-thread-split",                         0x8000000000000000},
-{"fw-bcctrl-serialized",                        0x8000000000000000},
-{"speculation-policy-favor-security",           0x8000000000000000},
-{"fw-count-cache-disabled",                     0x0000000000000000}};
+{"tm-suspend-mode",                                 0x0000000000000000},
+{"inst-spec-barrier-ori31,31,0",                    0x8000000000000000},
+{"fw-bcctrl-serialized",                            0x8000000000000000},
+{"inst-l1d-flush-ori30,30,0",                       0x0000000000000000},
+{"inst-l1d-flush-trig2",                            0x0000000000000000},
+{"fw-l1d-thread-split",                             0x8000000000000000},
+{"fw-branch-hints-honored",                         0x8000000000000000},
+{"inst-thread-reconfig-control-trig0-1",            0x0000000000000000},
+{"fw-count-cache-disabled",                         0x0000000000000000},
+{"fw-ltptr-serialized",                             0x0000000000000000},
+{"speculation-policy-favor-security",               0x8000000000000000},
+{"user-mode-branch-speculation",                    0x0000000000000000},
+{"needs-l1d-flush-msr-hv-1-to-0",                   0x8000000000000000},
+{"needs-l1d-flush-msr-pr-0-to-1",                   0x8000000000000000},
+{"needs-spec-barrier-for-bound-checks",             0x8000000000000000}};
 
 const hdatIplpFeatureFlagSetting_t hdatIplpFeatureFlagSettingsArray_20_risk100[]=
+//RISK 100 (Kernel + User)
 {
-{"tm-suspend-mode",                             0x0000000000000000},
-{"inst-thread-reconfig-control-trig0-1",        0x0000000000000000},
-{"inst-l1d-flush-trig2",                        0x0000000000000000},
-{"inst-l1d-flush-ori30,30,0",                   0x0000000000000000},
-{"inst-spec-barrier-ori31,31,0",                0x0000000000000000},
-{"needs-l1d-flush-msr-hv-1-to-0",               0x0000000000000000},
-{"needs-l1d-flush-msr-pr-0-to-1",               0x0000000000000000},
-{"needs-spec-barrier-for-bound-checks",         0x0000000000000000},
-{"fw-l1d-thread-split",                         0x0000000000000000},
-{"fw-bcctrl-serialized",                        0x0000000000000000},
-{"speculation-policy-favor-security",           0x0000000000000000},
-{"fw-count-cache-disabled",                     0x0000000000000000}};
-
+{"tm-suspend-mode",                                 0x0000000000000000},
+{"inst-spec-barrier-ori31,31,0",                    0x8000000000000000},
+{"fw-bcctrl-serialized",                            0x0000000000000000},
+{"inst-l1d-flush-ori30,30,0",                       0x0000000000000000},
+{"inst-l1d-flush-trig2",                            0x0000000000000000},
+{"fw-l1d-thread-split",                             0x8000000000000000},
+{"fw-branch-hints-honored",                         0x8000000000000000},
+{"inst-thread-reconfig-control-trig0-1",            0x0000000000000000},
+{"fw-count-cache-disabled",                         0x8000000000000000},
+{"fw-ltptr-serialized",                             0x0000000000000000},
+{"speculation-policy-favor-security",               0x8000000000000000},
+{"user-mode-branch-speculation",                    0x8000000000000000},
+{"needs-l1d-flush-msr-hv-1-to-0",                   0x8000000000000000},
+{"needs-l1d-flush-msr-pr-0-to-1",                   0x8000000000000000},
+{"needs-spec-barrier-for-bound-checks",             0x8000000000000000}};
 
 const hdatIplpFeatureFlagSetting_t hdatIplpFeatureFlagSettingsArray_21[]=
+//RISK 0 (Kernel)
 {
-{"tm-suspend-mode",                             0x0000000000000000},
-{"inst-thread-reconfig-control-trig0-1",        0x0000000000000000},
-{"inst-l1d-flush-trig2",                        0x0000000000000000},
-{"inst-l1d-flush-ori30,30,0",                   0x0000000000000000},
-{"inst-spec-barrier-ori31,31,0",                0x8000000000000000},
-{"needs-l1d-flush-msr-hv-1-to-0",               0x8000000000000000},
-{"needs-l1d-flush-msr-pr-0-to-1",               0x8000000000000000},
-{"needs-spec-barrier-for-bound-checks",         0x8000000000000000},
-{"fw-l1d-thread-split",                         0x8000000000000000},
-{"fw-bcctrl-serialized",                        0x8000000000000000},
-{"speculation-policy-favor-security",           0x8000000000000000},
-{"fw-count-cache-disabled",                     0x0000000000000000}};
+{"tm-suspend-mode",                                 0x0000000000000000},
+{"inst-spec-barrier-ori31,31,0",                    0x8000000000000000},
+{"fw-bcctrl-serialized",                            0x8000000000000000},
+{"inst-l1d-flush-ori30,30,0",                       0x0000000000000000},
+{"inst-l1d-flush-trig2",                            0x0000000000000000},
+{"fw-l1d-thread-split",                             0x8000000000000000},
+{"fw-branch-hints-honored",                         0x8000000000000000},
+{"inst-thread-reconfig-control-trig0-1",            0x0000000000000000},
+{"fw-count-cache-disabled",                         0x0000000000000000},
+{"fw-ltptr-serialized",                             0x0000000000000000},
+{"speculation-policy-favor-security",               0x8000000000000000},
+{"user-mode-branch-speculation",                    0x0000000000000000},
+{"needs-l1d-flush-msr-hv-1-to-0",                   0x8000000000000000},
+{"needs-l1d-flush-msr-pr-0-to-1",                   0x8000000000000000},
+{"needs-spec-barrier-for-bound-checks",             0x8000000000000000}};
 
 const hdatIplpFeatureFlagSetting_t hdatIplpFeatureFlagSettingsArray_21_risk100[]=
+// Risk Level 100 , DD2.1 (Kernel + User)
 {
-{"tm-suspend-mode",                             0x0000000000000000},
-{"inst-thread-reconfig-control-trig0-1",        0x0000000000000000},
-{"inst-l1d-flush-trig2",                        0x0000000000000000},
-{"inst-l1d-flush-ori30,30,0",                   0x0000000000000000},
-{"inst-spec-barrier-ori31,31,0",                0x0000000000000000},
-{"needs-l1d-flush-msr-hv-1-to-0",               0x0000000000000000},
-{"needs-l1d-flush-msr-pr-0-to-1",               0x0000000000000000},
-{"needs-spec-barrier-for-bound-checks",         0x0000000000000000},
-{"fw-l1d-thread-split",                         0x0000000000000000},
-{"fw-bcctrl-serialized",                        0x0000000000000000},
-{"speculation-policy-favor-security",           0x0000000000000000},
-{"fw-count-cache-disabled",                     0x0000000000000000}};
+{"tm-suspend-mode",                                 0x0000000000000000},
+{"inst-spec-barrier-ori31,31,0",                    0x8000000000000000},
+{"fw-bcctrl-serialized",                            0x0000000000000000},
+{"inst-l1d-flush-ori30,30,0",                       0x0000000000000000},
+{"inst-l1d-flush-trig2",                            0x0000000000000000},
+{"fw-l1d-thread-split",                             0x8000000000000000},
+{"fw-branch-hints-honored",                         0x8000000000000000},
+{"inst-thread-reconfig-control-trig0-1",            0x0000000000000000},
+{"fw-count-cache-disabled",                         0x8000000000000000},
+{"fw-ltptr-serialized",                             0x0000000000000000},
+{"speculation-policy-favor-security",               0x8000000000000000},
+{"user-mode-branch-speculation",                    0x8000000000000000},
+{"needs-l1d-flush-msr-hv-1-to-0",                   0x8000000000000000},
+{"needs-l1d-flush-msr-pr-0-to-1",                   0x8000000000000000},
+{"needs-spec-barrier-for-bound-checks",             0x8000000000000000}};
 
 const hdatIplpFeatureFlagSetting_t hdatIplpFeatureFlagSettingsArray_22[]=
+// Risk Level 0 , DD2.2 (Kernel + User)
 {
-{"tm-suspend-mode",                             0x8000000000000000},
-{"inst-thread-reconfig-control-trig0-1",        0x0000000000000000},
-{"inst-l1d-flush-trig2",                        0x8000000000000000},
-{"inst-l1d-flush-ori30,30,0",                   0x0000000000000000},
-{"inst-spec-barrier-ori31,31,0",                0x8000000000000000},
-{"needs-l1d-flush-msr-hv-1-to-0",               0x8000000000000000},
-{"needs-l1d-flush-msr-pr-0-to-1",               0x8000000000000000},
-{"needs-spec-barrier-for-bound-checks",         0x8000000000000000},
-{"fw-l1d-thread-split",                         0x8000000000000000},
-{"fw-bcctrl-serialized",                        0x8000000000000000},
-{"speculation-policy-favor-security",           0x8000000000000000},
-{"fw-count-cache-disabled",                     0x0000000000000000}};
+{"tm-suspend-mode",                                 0x8000000000000000},
+{"inst-spec-barrier-ori31,31,0",                    0x8000000000000000},
+{"fw-bcctrl-serialized",                            0x0000000000000000},
+{"inst-l1d-flush-ori30,30,0",                       0x0000000000000000},
+{"inst-l1d-flush-trig2",                            0x8000000000000000},
+{"fw-l1d-thread-split",                             0x8000000000000000},
+{"fw-branch-hints-honored",                         0x8000000000000000},
+{"inst-thread-reconfig-control-trig0-1",            0x0000000000000000},
+{"fw-count-cache-disabled",                         0x8000000000000000},
+{"fw-ltptr-serialized",                             0x0000000000000000},
+{"speculation-policy-favor-security",               0x8000000000000000},
+{"user-mode-branch-speculation",                    0x0000000000000000},
+{"needs-l1d-flush-msr-hv-1-to-0",                   0x8000000000000000},
+{"needs-l1d-flush-msr-pr-0-to-1",                   0x8000000000000000},
+{"needs-spec-barrier-for-bound-checks",             0x8000000000000000}};
 
 const hdatIplpFeatureFlagSetting_t hdatIplpFeatureFlagSettingsArray_22_risk100[]=
+// Risk Level 100 , DD2.2 (Kernel)
 {
-{"tm-suspend-mode",                             0x8000000000000000},
-{"inst-thread-reconfig-control-trig0-1",        0x0000000000000000},
-{"inst-l1d-flush-trig2",                        0x0000000000000000},
-{"inst-l1d-flush-ori30,30,0",                   0x0000000000000000},
-{"inst-spec-barrier-ori31,31,0",                0x0000000000000000},
-{"needs-l1d-flush-msr-hv-1-to-0",               0x0000000000000000},
-{"needs-l1d-flush-msr-pr-0-to-1",               0x0000000000000000},
-{"needs-spec-barrier-for-bound-checks",         0x0000000000000000},
-{"fw-l1d-thread-split",                         0x0000000000000000},
-{"fw-bcctrl-serialized",                        0x0000000000000000},
-{"speculation-policy-favor-security",           0x0000000000000000},
-{"fw-count-cache-disabled",                     0x0000000000000000}};
+{"tm-suspend-mode",                                 0x8000000000000000},
+{"inst-spec-barrier-ori31,31,0",                    0x8000000000000000},
+{"fw-bcctrl-serialized",                            0x8000000000000000},
+{"inst-l1d-flush-ori30,30,0",                       0x0000000000000000},
+{"inst-l1d-flush-trig2",                            0x8000000000000000},
+{"fw-l1d-thread-split",                             0x8000000000000000},
+{"fw-branch-hints-honored",                         0x8000000000000000},
+{"inst-thread-reconfig-control-trig0-1",            0x0000000000000000},
+{"fw-count-cache-disabled",                         0x0000000000000000},
+{"fw-ltptr-serialized",                             0x0000000000000000},
+{"speculation-policy-favor-security",               0x8000000000000000},
+{"user-mode-branch-speculation",                    0x8000000000000000},
+{"needs-l1d-flush-msr-hv-1-to-0",                   0x8000000000000000},
+{"needs-l1d-flush-msr-pr-0-to-1",                   0x8000000000000000},
+{"needs-spec-barrier-for-bound-checks",             0x8000000000000000}};
 
 
 #define HDAT_CHIP_TYPE_MURANO                      "MURANO"
