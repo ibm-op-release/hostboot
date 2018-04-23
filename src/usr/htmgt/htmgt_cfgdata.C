@@ -1070,8 +1070,11 @@ void getAVSBusConfigMessageData( const TargetHandle_t i_occ,
     uint64_t index      = 0;
     uint8_t version = 0x01;
     o_size = 0;
-
     assert( o_data != nullptr );
+
+    Target* l_sys = nullptr;
+    targetService().getTopLevelTarget(l_sys);
+    assert(l_sys != nullptr);
 
     // Get the parent processor
     ConstTargetHandle_t l_proc = getParentChip( i_occ );
@@ -1102,9 +1105,9 @@ void getAVSBusConfigMessageData( const TargetHandle_t i_occ,
 
     ATTR_VDD_CURRENT_OVERFLOW_WORKAROUND_ENABLE_type overflow_enable = 0;
     ATTR_MAX_VDD_CURRENT_READING_type max_vdd_current = 0;
-    if ((l_proc->tryGetAttr          //if attr exists populate overflow_enable
+    if ((l_sys->tryGetAttr          //if attr exists populate overflow_enable
          <ATTR_VDD_CURRENT_OVERFLOW_WORKAROUND_ENABLE>(overflow_enable)) &&
-        (l_proc->tryGetAttr          //if attr exists populate max_vdd_current
+        (l_sys->tryGetAttr          //if attr exists populate max_vdd_current
          <ATTR_MAX_VDD_CURRENT_READING>(max_vdd_current)))
     {
         if (overflow_enable == 1)
