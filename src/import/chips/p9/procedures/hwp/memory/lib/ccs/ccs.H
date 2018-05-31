@@ -373,6 +373,7 @@ static void mrs_rcd_helper( fapi2::buffer<uint64_t>& i_arr0 )
 ///
 template< fapi2::TargetType T, typename TT = ccsTraits<T> >
 inline instruction_t<T> rcd_command( const fapi2::Target<fapi2::TARGET_TYPE_DIMM>& i_target,
+                                     const bool i_sim,
                                      const bool i_turn_on_cke = true)
 {
     fapi2::buffer<uint64_t> rcd_boilerplate_arr0;
@@ -386,8 +387,11 @@ inline instruction_t<T> rcd_command( const fapi2::Target<fapi2::TARGET_TYPE_DIMM
     // Not adding i_turn_on_cke in the mrs_rcd helper because we only need this
     // for RCWs and there is no need to complicate/change the MRS cmd API with
     // uneeded functionality. Little duplication, but this isolates the change.
-    const uint64_t l_cke = i_turn_on_cke ? CKE_HIGH : CKE_LOW;
-    rcd_boilerplate_arr0.insertFromRight<TT::ARR0_DDR_CKE, TT::ARR0_DDR_CKE_LEN>(l_cke);
+    if( !i_sim )
+    {
+        const uint64_t l_cke = i_turn_on_cke ? CKE_HIGH : CKE_LOW;
+        rcd_boilerplate_arr0.insertFromRight<TT::ARR0_DDR_CKE, TT::ARR0_DDR_CKE_LEN>(l_cke);
+    }
 
     //
     // RCD setup
