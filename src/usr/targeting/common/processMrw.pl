@@ -6,7 +6,7 @@
 #
 # OpenPOWER HostBoot Project
 #
-# Contributors Listed Below - COPYRIGHT 2015,2017
+# Contributors Listed Below - COPYRIGHT 2015,2018
 # [+] International Business Machines Corp.
 #
 #
@@ -1998,6 +1998,16 @@ sub processI2C
             {
                 $addr = $targetObj->getBusAttribute(
                            $i2c->{SOURCE},$i2c->{BUS_NUM},"I2C_ADDRESS");
+            }
+
+            # If bus doesn't have I2C_ADDRESS or default value is not set,
+            # then get it from i2c-slave, if defined.
+            if ($addr eq "")
+            {
+                if (! $targetObj->isBadAttribute($i2c->{DEST},"I2C_ADDRESS") )
+                {
+                   $addr = $targetObj->getAttribute($i2c->{DEST},"I2C_ADDRESS");
+                }
             }
 
             if ($addr eq "") {$addr = "0xFF";}
