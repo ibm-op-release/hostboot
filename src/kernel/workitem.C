@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2016                             */
+/* Contributors Listed Below - COPYRIGHT 2016,2019                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -27,6 +27,7 @@
 #include <kernel/workitem.H>
 #include <kernel/console.H>
 #include <kernel/intmsghandler.H>
+#include <kernel/cpumgr.H>
 
 //Define the desired behavior for a CPU core/thread
 // wakeup scenario
@@ -41,10 +42,16 @@ void CpuWakeupDoorbellWorkItem::operator() (void)
     return;
 }
 
-/*TODO RTC 150861
-void IpcDoorbellWorkItem::operator() (void)
+void CpuTbRestoreDoorbellWorkItem::operator() (void)
 {
-    //Decide what needs to be done when the Ipc Doorbell is received
-    // (if anything)
+    size_t pir = getPIR();
+    cpu_t *l_cpu = CpuManager::getCpu(pir);
+
+    uint64_t l_restore_tb = l_cpu->cpu_restore_tb;
+    printkd("pir:%ld tb:0x%0x\n", pir, l_restore_tb);
+    if (l_restore_tb > getTB())
+    {
+        setTB(l_restore_tb);
+    }
+    return;
 }
-**/

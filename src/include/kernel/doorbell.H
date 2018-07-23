@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2015,2016                        */
+/* Contributors Listed Below - COPYRIGHT 2015,2019                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -55,6 +55,13 @@ void send_doorbell_wakeup(uint64_t i_pir);
  *
  * void send_doorbell_ipc(cpu_t *i_cpu, uint64_t pir);
 **/
+
+/** Send a doorbell and also restore the thread's timebase
+ *
+ * @param i_pir - PIR to send doorbell to wakeup
+ * @param i_tb  - Timebase value to restore during wakeup
+ */
+void send_doorbell_restore_tb(uint64_t i_pir, uint64_t i_tb);
 
 enum
 {
