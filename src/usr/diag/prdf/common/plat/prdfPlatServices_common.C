@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2016,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2016,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -230,7 +230,7 @@ int32_t setVpdFailedLanesXbus(TargetHandle_t i_rxBusTgt,
     errlHndl_t err = nullptr;
 
     fapi2::Target<fapi2::TARGET_TYPE_XBUS> fapiRxTrgt (i_rxBusTgt);
-    fapi2::Target<fapi2::TARGET_TYPE_XBUS> fapiTxTrgt (i_rxBusTgt);
+    fapi2::Target<fapi2::TARGET_TYPE_XBUS> fapiTxTrgt (i_txBusTgt);
 
     FAPI_INVOKE_HWP(err,
                     erepairSetFailedLanes,
