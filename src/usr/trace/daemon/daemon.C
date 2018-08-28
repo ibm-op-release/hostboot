@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2012,2016                        */
+/* Contributors Listed Below - COPYRIGHT 2012,2018                        */
 /* [+] Google Inc.                                                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
@@ -108,10 +108,12 @@ namespace TRACEDAEMON
         //      The one at the end will only be useful in non-FSP environments
         //      for continuous trace, because the mailbox is already shutdown.
         //
-        INITSERVICE::registerShutdownEvent(iv_service->iv_daemon->iv_queue,
+        INITSERVICE::registerShutdownEvent(TRACE_COMP_ID,
+                                           iv_service->iv_daemon->iv_queue,
                                            DaemonIf::TRACE_DAEMON_SIGNAL,
                                            INITSERVICE::HIGHEST_PRIORITY);
-        INITSERVICE::registerShutdownEvent(iv_service->iv_daemon->iv_queue,
+        INITSERVICE::registerShutdownEvent(TRACE_COMP_ID,
+                                           iv_service->iv_daemon->iv_queue,
                                            DaemonIf::TRACE_DAEMON_SIGNAL,
                                            INITSERVICE::LOWEST_PRIORITY);
 

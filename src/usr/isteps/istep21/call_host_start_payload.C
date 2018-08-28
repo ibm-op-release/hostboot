@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2015,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2015,2018                        */
 /* [+] Google Inc.                                                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
@@ -209,9 +209,9 @@ void* call_host_start_payload (void *io_pArgs)
         msg_q_t l_msgQ = msg_q_create();
 
         // Register event to be called on shutdown
-        INITSERVICE::registerShutdownEvent(l_msgQ,
-                                           MSG_PRE_SHUTDOWN_INITS,
-                                           INITSERVICE::PRESHUTDOWN_INIT_PRIORITY);
+        INITSERVICE::registerShutdownEvent(ISTEP_COMP_ID, l_msgQ,
+                                       MSG_PRE_SHUTDOWN_INITS,
+                                       INITSERVICE::PRESHUTDOWN_INIT_PRIORITY);
 
         // Create a task to handle the messages
         task_create(ISTEP_21::msg_handler, l_msgQ);

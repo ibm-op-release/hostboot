@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2011,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2011,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -359,7 +359,7 @@ errlHndl_t IntrRp::_init()
         task_create(IntrRp::msg_handler, NULL);
 
         // Register event to be called on shutdown
-        INITSERVICE::registerShutdownEvent(iv_msgQ,
+        INITSERVICE::registerShutdownEvent(INTR_COMP_ID, iv_msgQ,
                                            MSG_INTR_SHUTDOWN,
                                            INITSERVICE::INTR_PRIORITY);
 

@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2011,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2011,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -71,9 +71,18 @@ namespace   SPLESS
 
 namespace   INITSERVICE
 {
+trace_desc_t *g_trac_initsvc = nullptr;
 
-trace_desc_t *g_trac_initsvc = NULL;
-TRAC_INIT(&g_trac_initsvc, "INITSVC", 2*KILOBYTE );
+/**
+ *  @brief  Instantiates trace object for INITSVC traces (if necessary)
+ */
+void initTrace()
+{
+    if ( nullptr == g_trac_initsvc )
+    {
+      TRACE::TracInit l_tmp(&g_trac_initsvc, "INITSVC", 2*KILOBYTE );
+    }
+}
 
 /**
  *  @brief  start() task entry procedure
@@ -82,6 +91,8 @@ TRAC_INIT(&g_trac_initsvc, "INITSVC", 2*KILOBYTE );
 extern "C"
 void* _start(void *ptr)
 {
+    initTrace();  // initialize trace descriptor for module start
+
     TRACFCOMP( g_trac_initsvc,
             "Executing Initialization Service module." );
 
@@ -608,6 +619,7 @@ InitService& InitService::getTheInstance( )
 InitService::InitService( ) :
     iv_shutdownInProgress(false)
 {
+    initTrace();  // Initialize trace descriptor for external interface
     mutex_init(&iv_registryMutex);
 }
 
@@ -806,7 +818,9 @@ void InitService::doShutdown(uint64_t i_status,
             (i->msgPriority <= LAST_PRE_MEM_FLUSH_PRIORITY));
         ++i)
     {
-            TRACFCOMP(g_trac_initsvc,"notify priority=0x%x, queue=0x%x", i->msgPriority, i->msgQ );
+            TRACFCOMP(g_trac_initsvc, "notify priority=0x%x, queue=0x%x, "
+                "msgType=0x%x, componentID=0x%x", i->msgPriority, i->msgQ,
+                i->msgType, i->compID );
             l_msg->type = i->msgType;
             l_msg->data[0] = worst_status;
             (void)msg_sendrecv(i->msgQ,l_msg);
@@ -891,7 +905,8 @@ void doShutdownWithError ( uint64_t i_status, uint32_t i_error_info)
 }
 
 
-bool InitService::registerShutdownEvent(msg_q_t i_msgQ,
+bool InitService::registerShutdownEvent(compId_t i_compID,
+                                        msg_q_t i_msgQ,
                                         uint32_t i_msgType,
                                         EventPriority_t i_priority)
 {
@@ -916,8 +931,13 @@ bool InitService::registerShutdownEvent(msg_q_t i_msgQ,
 
         if(result)
         {
+            TRACFCOMP(g_trac_initsvc, "InitService::registerShutdownEvent: "
+                "componentID=0x%x, queue=0x%x, msgType=0x%x, priority=0x%x",
+                i_compID, i_msgQ, i_msgType, i_priority);
+
             // add it to the queue, we'll sort it before sending
-            iv_regMsgQ.push_back(regMsgQ_t(i_msgQ, i_msgType, i_priority));
+            iv_regMsgQ.push_back( regMsgQ_t(i_msgQ, i_msgType,
+                                            i_priority, i_compID) );
         }
     }
 
@@ -942,6 +962,11 @@ bool InitService::unregisterShutdownEvent(msg_q_t i_msgQ)
             // erase all instances
             if(r->msgQ == i_msgQ)
             {
+                TRACFCOMP(g_trac_initsvc,
+                    "InitService::unregisterShutdownEvent: "
+                    "componentID=0x%x, queue=0x%x, msgType=0x%x, priority=0x%x",
+                    r->compID, r->msgQ, r->msgType, r->msgPriority);
+
                 result = true;
                 iv_regMsgQ.erase(r);
             }
@@ -956,12 +981,14 @@ bool InitService::unregisterShutdownEvent(msg_q_t i_msgQ)
 /**
  * @see src/include/usr/initservice/initservicif.H
  */
-bool registerShutdownEvent(msg_q_t i_msgQ,
+bool registerShutdownEvent(compId_t i_compID,
+                           msg_q_t i_msgQ,
                            uint32_t i_msgType,
                            EventPriority_t i_priority)
 {
     return
-    Singleton<InitService>::instance().registerShutdownEvent(i_msgQ,
+    Singleton<InitService>::instance().registerShutdownEvent(i_compID,
+                                                             i_msgQ,
                                                              i_msgType,
                                                              i_priority);
 }

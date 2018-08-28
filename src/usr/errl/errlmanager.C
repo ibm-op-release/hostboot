@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2011,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2011,2018                        */
 /* [+] Google Inc.                                                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
@@ -210,8 +210,10 @@ void ErrlManager::msgQueueInit ()
     iv_msgQ = msg_q_create();
 
     // Register for error log manager shutdown event
-    INITSERVICE::registerShutdownEvent( iv_msgQ, ERRLOG_SHUTDOWN_TYPE,
-                                                  INITSERVICE::NO_PRIORITY );
+    INITSERVICE::registerShutdownEvent( ERRL_COMP_ID,
+                                        iv_msgQ,
+                                        ERRLOG_SHUTDOWN_TYPE,
+                                        INITSERVICE::NO_PRIORITY );
 
     TRACFCOMP( g_trac_errl, EXIT_MRK "ErrlManager::msgQueueInit" );
     return;

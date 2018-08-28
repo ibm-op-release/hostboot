@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2012,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2012,2018                        */
 /* [+] Google Inc.                                                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
@@ -210,7 +210,8 @@ errlHndl_t MailboxSp::_init()
         MBOX::send(FSP_MAILBOX_MSGQ,msg);
 
         // Register for shutdown
-        INITSERVICE::registerShutdownEvent(iv_msgQ,
+        INITSERVICE::registerShutdownEvent(MBOX_COMP_ID,
+                                           iv_msgQ,
                                            MSG_MBOX_SHUTDOWN,
                                            INITSERVICE::MBOX_PRIORITY);
 

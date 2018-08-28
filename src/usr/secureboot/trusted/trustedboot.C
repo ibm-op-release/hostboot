@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2015,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2015,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -1200,8 +1200,9 @@ void* tpmDaemon(void* unused)
     // Register shutdown events with init service.
     //      Done at the "end" of shutdown processing.
     // This will flush any other messages (PCR extends) and terminate task
-    INITSERVICE::registerShutdownEvent(systemData.msgQ,
-                                       TRUSTEDBOOT::MSG_TYPE_SHUTDOWN);
+    INITSERVICE::registerShutdownEvent( SECURE_COMP_ID,
+                                        systemData.msgQ,
+                                        TRUSTEDBOOT::MSG_TYPE_SHUTDOWN );
 
     Message* tb_msg = nullptr;
     while (true)
