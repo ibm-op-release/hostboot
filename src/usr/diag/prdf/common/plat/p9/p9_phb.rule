@@ -5,7 +5,7 @@
 #
 # OpenPOWER HostBoot Project
 #
-# Contributors Listed Below - COPYRIGHT 2016,2017
+# Contributors Listed Below - COPYRIGHT 2016,2018
 # [+] International Business Machines Corp.
 #
 #
@@ -446,15 +446,15 @@ group gETUFIR filter singlebit, cs_root_cause
     /** ETUFIR[4]
      *  AIB_FATAL_CLASS_ERROR
      */
-    (rETUFIR, bit(4)) ? defaultMaskedError;
+    (rETUFIR, bit(4)) ? self_th_1;
 
     /** ETUFIR[5]
-     *  spare
+     *  AIB_INF_CLASS_ERROR
      */
-    (rETUFIR, bit(5)) ? defaultMaskedError;
+    (rETUFIR, bit(5)) ? self_th_1;
 
     /** ETUFIR[6]
-     *  AIB_INF_CLASS_ERROR
+     *  spare
      */
     (rETUFIR, bit(6)) ? defaultMaskedError;
 
