@@ -255,6 +255,8 @@ void ErrlManager::errlogMsgHndlr ()
 {
     TRACFCOMP( g_trac_errl, ENTER_MRK "Enter ErrlManager::errlogMsgHndlr" );
 
+    task_detach();
+
     while( 1 )
     {
         msg_t * theMsg = msg_wait( iv_msgQ );
