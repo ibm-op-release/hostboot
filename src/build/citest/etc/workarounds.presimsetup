@@ -57,8 +57,6 @@ sbex -t 1035576
 
 echo "Grab tor sbe image"
 mkdir -p  $sb/sbei/sbfw/img/
-cp  /esw/fips910/Builds/b1107a_1746.910/src/sbei/sbfw/img/* $sb/sbei/sbfw/img/
-
 cd $sb/sbei/sbfw/ && mk -a
 cd -
 # ------ End workaround for MVPD DD2.0, Simics Nimbus ---------
