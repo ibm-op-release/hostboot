@@ -5,7 +5,7 @@
 #
 # OpenPOWER HostBoot Project
 #
-# Contributors Listed Below - COPYRIGHT 2012,2017
+# Contributors Listed Below - COPYRIGHT 2012,2018
 # [+] International Business Machines Corp.
 #
 #
@@ -55,7 +55,7 @@ $${IMGDIR}/$(1).pnor: $${IMGDIR}/hbicore_extended.bin $${IMGDIR}/$(1)_targeting.
 #	    --pnorOutBin $${IMGDIR}/$(1).pnor \
 #	    --binFile_part $${IMGDIR}/$(1)_pnor.toc \
 #	    --binFile_HBI $${IMGDIR}/hbicore_extended.bin \
-#	    --binFile_HBD $${IMGDIR}/$(1)_targeting.bin
+#	    --binFile_HBD_RO $${IMGDIR}/$(1)_targeting.bin
 #endif
 endef
 

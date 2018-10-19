@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2011,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2011,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -48,6 +48,7 @@
 #include <initservice/initserviceif.H>
 #include <util/align.H>
 #include <util/utilrsvdmem.H>
+#include <util/misc.H>
 #include <sys/misc.h>
 #include <fapi2/plat_attr_override_sync.H>
 #include <targeting/attrPlatOverride.H>
@@ -341,29 +342,61 @@ namespace TARGETING
         do
         {
             #ifdef CONFIG_SECUREBOOT
-            // Securely load HB_DATA section
-            l_errl = PNOR::loadSecureSection(PNOR::HB_DATA);
+            // Securely load HB_DATA_RO section
+            l_errl = PNOR::loadSecureSection(PNOR::HB_DATA_RO);
             if (l_errl)
             {
                 break;
             }
             #endif
 
-            // Locate attribute section in PNOR.
-            PNOR::SectionInfo_t l_pnorSectionInfo;
+            // Locate attribute READ-ONLY section in PNOR.
+            PNOR::SectionInfo_t l_pnorSectionInfo_RO;
             TargetingHeader* l_header = nullptr;
-            l_errl = PNOR::getSectionInfo(PNOR::HB_DATA,
-                                          l_pnorSectionInfo);
+            l_errl = PNOR::getSectionInfo(PNOR::HB_DATA_RO,
+                                          l_pnorSectionInfo_RO);
             if(l_errl)
             {
                 break;
+            }
+
+            // Locate attribute Read-Write section in PNOR.
+            bool l_HBD_RW_exists = false;
+            PNOR::SectionInfo_t l_pnorSectionInfo_RW;
+            l_errl = PNOR::getSectionInfo(PNOR::HB_DATA_RW,
+                                          l_pnorSectionInfo_RW);
+            if(l_errl)
+            {
+                // For op910 standalone simics HBD_RO contains the R/W
+                // attributes and HBD_RW is not used. Delete the error and
+                // continue
+                if (Util::isSimicsRunning())
+                {
+                    TRACFCOMP(g_trac_targeting,
+                             "Expected fail of getSectionInfo(HBD_DATA_RW) in "
+                             "simics so ignoring error and continuing");
+                    delete l_errl;
+                    l_errl = nullptr;
+                }
+                else
+                {
+                    // For HW we need HBD_RW to be present so break here
+                    TRACFCOMP(g_trac_targeting,
+                              "getSectionInfo(HBD_DATA_RW) returned an error");
+                    break;
+                }
+
+            }
+            else
+            {
+                l_HBD_RW_exists = true;
             }
 
             if(!iv_isMpipl)
             {
                 // Find attribute section header.
                 l_header =
-                reinterpret_cast<TargetingHeader*>(l_pnorSectionInfo.vaddr);
+                reinterpret_cast<TargetingHeader*>(l_pnorSectionInfo_RO.vaddr);
             }
             else
             {
@@ -549,7 +582,7 @@ namespace TARGETING
                 //          (PNOR addr + size of header + offset in header).
                 l_section =
                         reinterpret_cast<TargetingSection*>(
-                                l_pnorSectionInfo.vaddr + sizeof(TargetingHeader) +
+                                l_pnorSectionInfo_RO.vaddr + sizeof(TargetingHeader) +
                                 l_header->offsetToSections
                         );
             }
@@ -578,19 +611,33 @@ namespace TARGETING
                 // cache is of a different type, we first cast to extract the
                 // real pointer, then recast it into the cache
                 iv_sections[i].vmmAddress =
-                        static_cast<uint64_t>(
-                            TARG_TO_PLAT_PTR(l_header->vmmBaseAddress)) +
-                        l_header->vmmSectionOffset*i;
+                            static_cast<uint64_t>(
+                               TARG_TO_PLAT_PTR(l_header->vmmBaseAddress)) +
+                            l_header->vmmSectionOffset*i;
 
-
-                iv_sections[i].pnorAddress =
-                    l_pnorSectionInfo.vaddr + l_section->sectionOffset;
+                if ((iv_sections[i].type == SECTION_TYPE_PNOR_RW) &&
+                    (l_HBD_RW_exists == true))
+                {
+                    // For release-op910, the SECTION_TYPE_PNOR_RW was moved
+                    // to its own HBD_RW (aka "HB_DATA_RW") PNOR partition,
+                    // so use its values here
+                    iv_sections[i].pnorAddress =
+                        l_pnorSectionInfo_RW.vaddr;
+                }
+                else
+                {
+                    iv_sections[i].pnorAddress =
+                        l_pnorSectionInfo_RO.vaddr + l_section->sectionOffset;
+                }
 
                 #ifdef CONFIG_SECUREBOOT
                 // RW targeting section is part of the unprotected payload
                 // so use the normal PNOR virtual address space
-                if(   l_pnorSectionInfo.secure
-                   && iv_sections[i].type == SECTION_TYPE_PNOR_RW)
+                // NOTE: For release-op910 SECTION_TYPE_PNOR_RW was moved to its
+                // own unsecure partition, so it doesn't need this adjustment
+                if( (l_pnorSectionInfo_RO.secure
+                       && iv_sections[i].type == SECTION_TYPE_PNOR_RW)
+                     && (l_HBD_RW_exists == false))
                 {
                     iv_sections[i].pnorAddress -=
                         (VMM_VADDR_SPNOR_DELTA + VMM_VADDR_SPNOR_DELTA);
@@ -602,7 +649,8 @@ namespace TARGETING
                     //For MPIPL we are reading from real memory,
                     //not pnor flash. Set the real memory address
                     iv_sections[i].realMemAddress =
-                        reinterpret_cast<uint64_t>(l_header) + l_realMemOffset;
+                        reinterpret_cast<uint64_t>(l_header) +
+                            l_realMemOffset;
                 }
                 iv_sections[i].size = l_section->sectionSize;
 

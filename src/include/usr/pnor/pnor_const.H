@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2015,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2015,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -49,7 +49,8 @@ enum SectionId
     HCODE,          /**< HCODE Reference image */
     PAYLOAD,        /**< HAL/OPAL */
     HB_RUNTIME,     /**< Hostboot Runtime (for Sapphire) */
-    HB_DATA,        /**< Hostboot Data */
+    HB_DATA_RO,     /**< Hostboot Data : READ-ONLY */
+    HB_DATA_RW,     /**< Hostboot Data : Read-Write */
     GUARD_DATA,     /**< Guard Data */
     HB_ERRLOGS,     /**< Hostboot Error log Repository */
     DIMM_JEDEC_VPD, /**< DIMM JEDEC VPD */

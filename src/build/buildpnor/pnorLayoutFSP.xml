@@ -5,7 +5,7 @@
 <!--                                                                        -->
 <!-- OpenPOWER HostBoot Project                                             -->
 <!--                                                                        -->
-<!-- Contributors Listed Below - COPYRIGHT 2016,2017                        -->
+<!-- Contributors Listed Below - COPYRIGHT 2016,2018                        -->
 <!-- [+] International Business Machines Corp.                              -->
 <!--                                                                        -->
 <!--                                                                        -->
@@ -132,7 +132,7 @@ Layout Description - Used when building an FSP driver
     </section>
     <section>
         <description>Hostboot Data (2MB)</description>
-        <eyeCatch>HBD</eyeCatch>
+        <eyeCatch>HBD_RO</eyeCatch>
         <physicalOffset>0x251000</physicalOffset>
         <physicalRegionSize>0x200000</physicalRegionSize>
         <sha512Version/>

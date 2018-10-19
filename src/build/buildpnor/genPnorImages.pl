@@ -6,7 +6,7 @@
 #
 # OpenPOWER HostBoot Project
 #
-# Contributors Listed Below - COPYRIGHT 2016,2017
+# Contributors Listed Below - COPYRIGHT 2016,2018
 # [+] International Business Machines Corp.
 #
 #
@@ -569,9 +569,9 @@ sub manipulateImages
         $isNormalSecure ||= ($eyeCatch eq "HCODE");
         $isNormalSecure ||= ($eyeCatch eq "WOFDATA");
         $isNormalSecure ||= ($eyeCatch eq "IMA_CATALOG");
+        $isNormalSecure ||= ($eyeCatch eq "HBD_RO");
 
         my $isSpecialSecure = ($eyeCatch eq "HBB");
-        $isSpecialSecure ||= ($eyeCatch eq "HBD");
         $isSpecialSecure ||= ($eyeCatch eq "HBI");
 
         # Used to indicate security is supported in firmware
@@ -695,24 +695,6 @@ sub manipulateImages
                         }
 
                         run_command("cat $tempImages{PROTECTED_PAYLOAD} $bin_file > $tempImages{HDR_PHASE}");
-                    }
-                    # Handle read-only protected payload
-                    elsif ($eyeCatch eq "HBD")
-                    {
-                        if($openSigningTool)
-                        {
-                            run_command("$CUR_OPEN_SIGN_REQUEST "
-                                . "--protectedPayload $bin_file.protected "
-                                . "--out $tempImages{PROTECTED_PAYLOAD}");
-                        }
-                        else
-                        {
-                            # @TODO RTC:155374 Remove when official signing
-                            # supported
-                            run_command("$SIGNING_DIR/build -good -if $secureboot_hdr -of $tempImages{PROTECTED_PAYLOAD} -bin $bin_file.protected $SIGN_BUILD_PARAMS");
-                        }
-
-                        run_command("cat $tempImages{PROTECTED_PAYLOAD} $bin_file.unprotected > $tempImages{HDR_PHASE}");
                     }
                     else
                     {
@@ -1263,7 +1245,7 @@ print <<"ENDUSAGE";
   Usage:
     $programName --pnorlayout <layout xml file>
              --systemBinFiles HBI=hostboot_extended.bin,HBEL=HBEL.bin,GUARD=EMPTY
-             --systemBinFiles MURANO:HBD=simics_MURANO_targeting.bin
+             --systemBinFiles MURANO:HBD_RO=simics_MURANO_targeting.bin
              --build-all --test --binDir <path> --secureboot --corrupt HBI
 
   Parms:
@@ -1277,7 +1259,7 @@ print <<"ENDUSAGE";
                             For sections <NAME> that simply require zero-filling, you can pass in EMPTY or
                                 any non-existing file. If a file DNE, the script will handle accordingly.
                             Example: HBI=hostboot_extended.bin,GUARD=EMPTY
-                                     MURANO:HBD=simics_MURANO_targeting.bin
+                                     MURANO:HBD_RO=simics_MURANO_targeting.bin
     --test              Output test-only sections.
     --secureboot        Indicates a secureboot build.
     --corrupt           <Partition name>[= pro|unpro] (Note: requires '--secureboot')
@@ -1287,7 +1269,7 @@ print <<"ENDUSAGE";
                             [Note: Some sections only have a protected section so not relevant for all.]
                         Multiple '--corrupt' options are allowed, but note the system will checkstop on the
                             first bad partition so multiple may not be that useful.
-                        Example: --corrupt HBI --corrupt HBD=unpro
+                        Example: --corrupt HBI --corrupt HBD_RW=unpro
     --sign-mode <development|production>   Indicates how to sign partitions with either development keys or production keys
     --key-transition <imprint|production>   Indicates a key transition is needed and creates a secureboot key transition container.
                                             Note: "--sign-mode production" is not allowed with "--key-transition imprint"

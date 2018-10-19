@@ -5,7 +5,7 @@
 <!--                                                                        -->
 <!-- OpenPOWER HostBoot Project                                             -->
 <!--                                                                        -->
-<!-- Contributors Listed Below - COPYRIGHT 2015,2016                        -->
+<!-- Contributors Listed Below - COPYRIGHT 2015,2018                        -->
 <!-- [+] International Business Machines Corp.                              -->
 <!--                                                                        -->
 <!--                                                                        -->
@@ -121,7 +121,7 @@ Layout Description
     <section>
         <!-- NOTE: smaller than official layout  for fake-PNOR  -->
         <description>Attribute Data (256K)</description>
-        <eyeCatch>HBD</eyeCatch>
+        <eyeCatch>HBD_RO</eyeCatch>
         <physicalOffset>0xCA000</physicalOffset>
         <physicalRegionSize>0x40000</physicalRegionSize>
         <side>sideless</side>

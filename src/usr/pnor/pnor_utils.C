@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2011,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2011,2018                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -386,7 +386,7 @@ bool PNOR::isEnforcedSecureSection(const uint32_t i_section)
     #else
         return i_section == HB_BOOTLOADER ||
                i_section == HB_EXT_CODE ||
-               i_section == HB_DATA ||
+               i_section == HB_DATA_RO ||
                i_section == SBE_IPL ||
                i_section == PAYLOAD ||
                i_section == SBKT ||
@@ -410,7 +410,7 @@ bool PNOR::isCoreRootOfTrustSection(const PNOR::SectionId i_section)
     #else
         return i_section == HB_BOOTLOADER ||
                i_section == HB_EXT_CODE ||
-               i_section == HB_DATA ||
+               i_section == HB_DATA_RO ||
                i_section == SBE_IPL ||
                i_section == HB_BASE_CODE;
     #endif
@@ -440,7 +440,8 @@ const char * PNOR::SectionIdToString( uint32_t i_secIdIndex )
         "HCODE",       /**< PNOR::HCODE          : HCODE Reference image */
         "PAYLOAD",     /**< PNOR::PAYLOAD        : HAL/OPAL */
         "HBRT",        /**< PNOR::HB_RUNTIME     : Hostboot Runtime(for Sapphire)*/
-        "HBD",         /**< PNOR::HB_DATA        : Hostboot Data */
+        "HBD_RO",      /**< PNOR::HB_DATA_RO     : Hostboot Data : READ-ONLY */
+        "HBD_RW",      /**< PNOR::HB_DATA_RW     : Hostboot Data : Read-Write */
         "GUARD",       /**< PNOR::GUARD_DATA     : Hostboot Data */
         "HBEL",        /**< PNOR::HB_ERRLOGS     : Hostboot Error log Repository */
         "DJVPD",       /**< PNOR::DIMM_JEDEC_VPD : Dimm JEDEC VPD */
