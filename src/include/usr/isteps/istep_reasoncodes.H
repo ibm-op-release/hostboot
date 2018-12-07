@@ -123,6 +123,7 @@ namespace ISTEP
         RC_NO_FFDC_RETURNED                      = ISTEP_COMP_ID | 0x33,
         RC_RETURNED_FFDC                         = ISTEP_COMP_ID | 0x34,
         RC_P9N_DD1_NOT_SUPPORTED                 = ISTEP_COMP_ID | 0x35,
+        RC_PNOR_IPMI_NOT_ENABLED                 = ISTEP_COMP_ID | 0x36,
     };
 
 };
