@@ -63,6 +63,11 @@ enum LidId
     TARGETING_BINARY_LIDID = 0x81e00630,
     UCD_LIDID = 0x81e00650,
 
+    // two lids for 16GB and 32GB NVDIMMs
+    // @todo RTC 201197 - update when valid lids are created
+    NVDIMM_16GB_LIDID = 0xBADBAD16,
+    NVDIMM_32GB_LIDID = 0xBADBAD32,
+
     INVALID_LIDID = 0xFFFFFFFF
 };
 
