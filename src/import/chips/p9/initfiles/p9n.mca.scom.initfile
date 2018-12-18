@@ -1138,3 +1138,29 @@ espy MCP.PORT0.SRQ.MBA_WRQ0Q_CFG_DISABLE_WR_PG_MODE [when=S && !ATTR_CHIP_EC_FEA
   spyv;
   ON;
 }
+
+
+##########################################################
+# ADDED FOR ECC SYMB MARK EXIT 1 WAT WORKAROUND HW474117 #
+##########################################################
+# Additional part of this WAT in p9n.mcbist.scom.initfile
+
+# SELECT BYPASS DISABLE (0) AS ACTION
+ispy MCP.PORT0.ECC64.SCOM.DBGR_ECC_WAT_ACTION_SELECT [when=S && !ATTR_CHIP_EC_FEATURE_NEW_MC_DD2_SETTINGS] { # dd1.0 hierarchy
+  spyv;
+  0b0;
+}
+ispy MCP.PORT0.ECC64.ECC.SCOM.DBGR_ECC_WAT_ACTION_SELECT [when=S && ATTR_CHIP_EC_FEATURE_NEW_MC_DD2_SETTINGS] { # dd2.X hierarchy
+  spyv;
+  0b0;
+}
+
+# WAT SOURCE: SELECT EVENT0
+ispy MCP.PORT0.ECC64.SCOM.DBGR_ECC_WAT_SOURCE [when=S && !ATTR_CHIP_EC_FEATURE_NEW_MC_DD2_SETTINGS] { # dd1.0 hierarchy
+  spyv;
+  0b00;
+}
+ispy MCP.PORT0.ECC64.ECC.SCOM.DBGR_ECC_WAT_SOURCE [when=S && ATTR_CHIP_EC_FEATURE_NEW_MC_DD2_SETTINGS] { # dd2.X hierarchy
+  spyv;
+  0b00;
+}
