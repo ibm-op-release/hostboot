@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2016,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2016,2019                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -38,6 +38,7 @@
 #include <lib/shared/mss_const.H>
 #include <generic/memory/lib/utils/scom.H>
 #include <lib/ecc/ecc.H>
+#include <lib/workarounds/mca_workarounds.H>
 
 namespace mss
 {
@@ -356,6 +357,9 @@ fapi2::ReturnCode place_symbol_mark(const fapi2::Target<fapi2::TARGET_TYPE_DIMM>
     FAPI_DBG("Setting firmware symbol mark on rank:%d dq:%d galois:0x%02x", i_rank, i_dq, l_galois);
     FAPI_TRY( mss::ecc::set_fwms(l_mca, i_rank, l_galois, mss::ecc::fwms::mark_type::SYMBOL,
                                  mss::ecc::fwms::mark_region::MRANK, l_addr) );
+
+    // Apply workaround for HW474117 if we place a symbol mark
+    FAPI_TRY( mss::workarounds::disable_bypass(l_mca) );
 
 fapi_try_exit:
     return fapi2::current_err;
