@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2015,2016                        */
+/* Contributors Listed Below - COPYRIGHT 2015,2019                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -75,6 +75,10 @@ void send_doorbell_wakeup(uint64_t i_pir)
     // execution
     KernelWorkItem* l_work = new CpuWakeupDoorbellWorkItem();
     l_cpu->doorbell_actions.push(l_work);
+    //Put a barrier here to prevent a possible weak consistency
+    // issue with the l_work memory getting consumed incorrectly
+    // by the new thread that wakes up
+    sync();
     //Send doorbell to wakeup core/thread
     doorbell_send(i_pir);
 }
@@ -90,6 +94,17 @@ void send_doorbell_ipc(uint64_t i_pir)
     // execution (if needed, otherwise can likely delete and just send doorbell)
     KernelWorkItem* l_work = new IpcDoorbellWorkItem();
     l_cpu->doorbell_actions.push(l_work);
-    doorbell_send(i_pir)
+    //Put a barrier here to prevent a possible weak consistency
+    // issue with the l_work memory getting consumed incorrectly
+    // by the new thread that wakes up
+    sync();
+    //Send doorbell to wakeup core/thread
+    doorbell_send(i_pir);
+}
+
+void send_doorbell_ipc(uint64_t i_pir)
+{
+    printk("send_doorbell_ipc to pir: %lx\n", i_pir);
+    doorbell_send(i_pir);
 }
 **/
