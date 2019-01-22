@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2010,2014                        */
+/* Contributors Listed Below - COPYRIGHT 2010,2019                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -97,6 +97,8 @@ namespace Systemcalls
         MISC_CPUNAP,
             /** cpu_master_winkle() */
         MISC_CPUWINKLE,
+            /** cpu_wakeup_core() */
+        MISC_CPUWAKEUPCORE,
 
             /** mm_alloc_block() */
         MM_ALLOC_BLOCK,

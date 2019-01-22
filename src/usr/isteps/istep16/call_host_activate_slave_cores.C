@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2015,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2015,2019                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -121,6 +121,18 @@ void* call_host_activate_slave_cores (void *io_pArgs)
 
             int rc = cpu_start_core(pir, en_threads);
 
+            // Workaround to handle some syncing issues with new cpus
+            //  waking
+            if (-ETIME == rc)
+            {
+                TRACFCOMP( ISTEPS_TRACE::g_trac_isteps_trace,
+                        "call_host_activate_slave_cores: "
+                        "Time out rc from kernel %d on core 0x%x, resending doorbell",
+                        rc,
+                        pir);
+                rc = cpu_wakeup_core(pir,en_threads);
+            }
+
             // Handle time out error
             if (-ETIME == rc)
             {
@@ -219,6 +231,9 @@ void* call_host_activate_slave_cores (void *io_pArgs)
                         "PLID=0x%x", l_errl->plid()  );
 
                 ErrlUserDetailsTarget(*l_core).addToLog( l_errl );
+
+                // Add interesting ISTEP traces
+                l_errl->collectTrace(ISTEP_COMP_NAME,256);
 
                 // Create IStep error log and cross ref error that
                 // occurred
