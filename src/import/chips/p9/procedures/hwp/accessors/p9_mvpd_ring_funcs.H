@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2016,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2016,2019                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -55,7 +55,9 @@ typedef ReturnCode (*mvpdRingFuncs_FP_t) (
     const uint64_t,
     const uint8_t,
     uint8_t*,
-    uint32_t& );
+    uint32_t&,
+    uint8_t*,
+    uint32_t );
 
 extern "C"
 {
@@ -76,6 +78,9 @@ extern "C"
      * @param i_ringId         - Ring ID
      * @param o_pRingBuf       - The buffer to receive or send the ring
      * @param io_rRingBufsize  - Size of ring / ring buffer
+     * @param i_pTempBuf       - Temp buffer, must be large enough to fit the
+     *                           largest vpd record that contains ring data
+     * @param i_tempBufsize    - Size of temp buffer
      *
      * @return fapi2::ReturnCode -   FAPI_RC_SUCCESS if success,
      *                              relevant error code for failure.
@@ -89,7 +94,9 @@ extern "C"
                              const uint8_t        i_evenOdd,
                              const uint8_t        i_ringId,
                              uint8_t*             o_pRingBuf,
-                             uint32_t&            io_rRingBufsize );
+                             uint32_t&            io_rRingBufsize,
+                             uint8_t*             i_pTempBuf = nullptr,
+                             uint32_t             i_tempBufsize = 0 );
 
 } // extern "C"
 } // namespace fapi
