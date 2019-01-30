@@ -135,7 +135,6 @@ void* call_host_activate_slave_cores (void *io_pArgs)
             }
 
             // Handle time out error
-            uint32_t l_checkidle_eid = 0;
             if (-ETIME == rc)
             {
                 TRACFCOMP( ISTEPS_TRACE::g_trac_isteps_trace,
@@ -172,9 +171,6 @@ void* call_host_activate_slave_cores (void *io_pArgs)
                     // Create IStep error log
                     l_stepError.addErrorDetails(l_timeout_errl);
 
-                    // Save the HWP eid for later
-                    l_checkidle_eid = l_timeout_errl->eid();
-
                     // Commit error
                     errlCommit( l_timeout_errl, HWPF_COMP_ID );
                 }
@@ -185,8 +181,7 @@ void* call_host_activate_slave_cores (void *io_pArgs)
               (*l_core)->getAttr<TARGETING::ATTR_PREVIOUS_WAKEUP_FAIL>();
 
             // Create predictive error log if this is the first failure
-            //   AND the HWP didn't see a problem
-            if( (0 != rc) && (l_prevFail == 0) && (l_checkidle_eid == 0) )
+            if( (0 != rc) && (l_prevFail == 0) )
             {
                 TRACFCOMP( ISTEPS_TRACE::g_trac_isteps_trace,
                         "call_host_activate_slave_cores: "
@@ -243,9 +238,7 @@ void* call_host_activate_slave_cores (void *io_pArgs)
                 break;
             }
             // Create unrecoverable error log if this is a repeat
-            //  OR if the HWP hit something
-            else if( (0 != rc) &&
-                     ((l_prevFail > 0) || (l_checkidle_eid != 0)) )
+            else if( (0 != rc) && (l_prevFail > 0) )
             {
                 TRACFCOMP( ISTEPS_TRACE::g_trac_isteps_trace,
                            "call_host_activate_slave_cores: "
@@ -258,11 +251,9 @@ void* call_host_activate_slave_cores (void *io_pArgs)
                  * @moduleid    MOD_HOST_ACTIVATE_SLAVE_CORES
                  * @userdata1[00:31]   PIR of failing core.
                  * @userdata2[32:63]   Number of previous failures.
-                 * @userdata2[00:31]   EID from p9_check_idle_stop_done().
                  * @userdata2[32:63]   rc of cpu_start_core().
                  *
-                 * @devdesc Kernel returned error when trying to activate
-                 *          core.
+                 * @devdesc Slave core did not activate even after retry.
                  */
                 l_errl = new ERRORLOG::ErrlEntry(
                                ERRORLOG::ERRL_SEV_UNRECOVERABLE,
@@ -272,7 +263,7 @@ void* call_host_activate_slave_cores (void *io_pArgs)
                                    pir,
                                    l_prevFail),
                                TWO_UINT32_TO_UINT64(
-                                   l_checkidle_eid,
+                                   0,
                                    rc) );
 
                 // Callout and gard core that failed to wake up.
