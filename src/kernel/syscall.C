@@ -66,13 +66,14 @@ void kernel_execute_hype_doorbell()
     doorbell_clear();
 
     //Execute all work items on doorbell_actions stack
-    KernelWorkItem *l_work = t->cpu->doorbell_actions.pop();
-    while(l_work != NULL)
+    cpu_t* l_cpu = CpuManager::getCurrentCPU();
+    KernelWorkItem *l_work = l_cpu->doorbell_actions.pop();
+    while(l_work != nullptr)
     {
         //Execute Work Item and then delete it
         (*l_work)();
         delete l_work;
-        l_work = t->cpu->doorbell_actions.pop();
+        l_work = l_cpu->doorbell_actions.pop();
     }
 
     if (t->cpu->idle_task == t)
