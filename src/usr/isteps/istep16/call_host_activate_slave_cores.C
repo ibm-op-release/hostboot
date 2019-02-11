@@ -161,11 +161,20 @@ void* call_host_activate_slave_cores (void *io_pArgs)
                 TRACFCOMP( ISTEPS_TRACE::g_trac_isteps_trace,
                     "Call p9_check_idle_stop_done on processor %s", l_targName );
 
-                FAPI_INVOKE_HWP( l_timeout_errl,
-                                 p9_check_idle_stop_done,
-                                 l_fapi2_coreTarget );
+                fapi2::ReturnCode l_fapirc;
+                FAPI_INVOKE_HWP_RC( l_timeout_errl,
+                                    l_fapirc,
+                                    p9_check_idle_stop_done,
+                                    l_fapi2_coreTarget );
 
-                if (l_timeout_errl)
+                // Ignore the 'everything is okay' response
+                if ( l_fapirc
+                     == (fapi2::ReturnCode)fapi2::RC_CORE_POWERED_AND_RUNNING)
+                {
+                    delete l_timeout_errl;
+                    l_timeout_errl = nullptr;
+                }
+                else if (l_timeout_errl)
                 {
                     TRACFCOMP(ISTEPS_TRACE::g_trac_isteps_trace,
                           "ERROR : p9_check_idle_stop_done" );
