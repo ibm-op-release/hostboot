@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2013,2018                        */
+/* Contributors Listed Below - COPYRIGHT 2013,2019                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -61,6 +61,8 @@ enum LidId
     HCODE_CONTAINER_LIDID = 0x80d0000c,
     HWREFIMG_RINGOVD_LIDID = 0x81e00620,
     TARGETING_BINARY_LIDID = 0x81e00630,
+    UCD_LIDID = 0x81e00650,
+
     INVALID_LIDID = 0xFFFFFFFF
 };
 
