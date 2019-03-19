@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2015,2018                        */
+/* Contributors Listed Below - COPYRIGHT 2015,2019                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -4742,6 +4742,47 @@ fapi2::ReturnCode get_wr_vref_rp_reg(const fapi2::Target<fapi2::TARGET_TYPE_MCA>
     FAPI_TRY(dram_to_dp_reg(i_target, i_dram, l_dp, l_reg_num));
 
     o_reg = (l_reg_num == 0) ? REGS[i_rp][l_dp].first : REGS[i_rp][l_dp].second;
+
+fapi_try_exit:
+    return fapi2::current_err;
+}
+
+///
+/// @brief Gets the write vref registers by rank pair
+/// @param[in] i_rp - rank pair, to make sure the dram and rp are within bounds
+/// @param[out] o_regs - the dp16 wr_vref registers for the rank pair
+///
+fapi2::ReturnCode get_wr_vref_regs_by_rp(const uint64_t i_rp,
+        std::vector<std::pair<uint64_t, uint64_t>>& o_reg)
+{
+    typedef dp16Traits<fapi2::TARGET_TYPE_MCA> TT;
+
+    switch (i_rp)
+    {
+        case 0:
+            o_reg = TT::WR_VREF_VALUE_RP0_REG;
+            break;
+
+        case 1:
+            o_reg = TT::WR_VREF_VALUE_RP1_REG;
+            break;
+
+        case 2:
+            o_reg = TT::WR_VREF_VALUE_RP2_REG;
+            break;
+
+        case 3:
+            o_reg = TT::WR_VREF_VALUE_RP3_REG;
+            break;
+
+        default:
+            FAPI_ASSERT( false,
+                         fapi2::MSS_RP_OUT_OF_RANGE()
+                         .set_RP(i_rp),
+                         "RP out of range %d",
+                         i_rp);
+            break;
+    }
 
 fapi_try_exit:
     return fapi2::current_err;
