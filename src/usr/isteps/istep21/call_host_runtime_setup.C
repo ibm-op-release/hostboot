@@ -677,6 +677,10 @@ void* call_host_runtime_setup (void *io_pArgs)
 
 #ifdef CONFIG_UCD_FLASH_UPDATES
         POWER_SEQUENCER::TI::UCD::call_update_ucd_flash();
+#else
+    TRACFCOMP(ISTEPS_TRACE::g_trac_isteps_trace,INFO_MRK
+              "call_host_runtime_setup: UCD Updates are not supported on "
+              "this platform and as such they are compiled out");
 #endif
 
         // Fill in Hostboot runtime data if there is a PAYLOAD
