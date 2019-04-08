@@ -68,8 +68,8 @@ TRAC_INIT( & g_trac_nvdimmr, "NVDIMMR", KILOBYTE );
 
 
 // Easy macro replace for unit testing
-#define TRACUCOMP(args...)  TRACFCOMP(args)
-//#define TRACUCOMP(args...)
+//#define TRACUCOMP(args...)  TRACFCOMP(args)
+#define TRACUCOMP(args...)
 
 // ----------------------------------------------
 // Defines
@@ -208,7 +208,7 @@ errlHndl_t nvdimmPerformOp( DeviceFW::OperationType i_opType,
             l_currentOpLen = l_snglChipSize - i2cInfo.offset;
         }
 
-        TRACFCOMP( g_trac_nvdimm,
+        TRACUCOMP( g_trac_nvdimm,
                    "nvdimmPerformOp():  i_opType=%d "
                    "e/p/dA=%d/%d/0x%X, offset=0x%X, len=0x%X, "
                    "snglChipKB=0x%X, chipCount=0x%X, devSizeKB=0x%X", i_opType,
@@ -218,7 +218,7 @@ errlHndl_t nvdimmPerformOp( DeviceFW::OperationType i_opType,
 
         // Printing mux info separately, if combined, nothing is displayed
         char* l_muxPath = i2cInfo.i2cMuxPath.toString();
-        TRACFCOMP(g_trac_nvdimm, "nvdimmPerformOp(): "
+        TRACUCOMP(g_trac_nvdimm, "nvdimmPerformOp(): "
                   "muxSelector=0x%X, muxPath=%s",
                   i2cInfo.i2cMuxBusSelector,
                   l_muxPath);
@@ -427,7 +427,7 @@ errlHndl_t nvdimmRead ( TARGETING::Target * i_target,
         if( err )
         {
             TRACFCOMP(g_trac_nvdimm,
-                    "Failed reading data: original read");
+                    ERR_MRK"nvdimmRead(): Failed reading data: original read");
             break;
         }
 
@@ -491,12 +491,10 @@ errlHndl_t nvdimmReadData( TARGETING::Target * i_target,
 
                 if( l_err )
                 {
-                    TRACFCOMP(g_trac_nvdimm,
-                              ERR_MRK"nvdimmReadData(): I2C Read-Offset failed on "
-                              "%d/%d/0x%X, aS=%d",
-                              i_i2cInfo.port, i_i2cInfo.engine,
-                              i_i2cInfo.devAddr,
-                              i_byteAddressSize);
+                    TRACFCOMP(g_trac_nvdimm, ERR_MRK"nvdimmReadData(): "
+                        "I2C Read-Offset failed on %d/%d/0x%X, aS=%d",
+                        i_i2cInfo.port, i_i2cInfo.engine,
+                        i_i2cInfo.devAddr, i_byteAddressSize);
 
                     // Printing mux info separately, if combined, nothing is displayed
                     char* l_muxPath = i_i2cInfo.i2cMuxPath.toString();
@@ -529,7 +527,7 @@ errlHndl_t nvdimmReadData( TARGETING::Target * i_target,
 
                 if( l_err )
                 {
-                    TRACFCOMP(g_trac_nvdimm,
+                    TRACUCOMP(g_trac_nvdimm,
                               ERR_MRK"nvdimmReadData(): I2C Read failed on "
                               "%d/%d/0x%0X",
                               i_i2cInfo.port, i_i2cInfo.engine,
@@ -537,7 +535,7 @@ errlHndl_t nvdimmReadData( TARGETING::Target * i_target,
 
                     // Printing mux info separately, if combined, nothing is displayed
                     char* l_muxPath = i_i2cInfo.i2cMuxPath.toString();
-                    TRACFCOMP(g_trac_nvdimm, ERR_MRK"nvdimmReadData(): "
+                    TRACUCOMP(g_trac_nvdimm, ERR_MRK"nvdimmReadData(): "
                               "muxSelector=0x%X, muxPath=%s",
                               i_i2cInfo.i2cMuxBusSelector,
                               l_muxPath);
@@ -576,9 +574,9 @@ errlHndl_t nvdimmReadData( TARGETING::Target * i_target,
                     // Save original retryable error
                     err_retryable = l_err;
 
-                    TRACFCOMP( g_trac_nvdimm, ERR_MRK"nvdimmReadData(): "
+                    TRACUCOMP( g_trac_nvdimm, ERR_MRK"nvdimmReadData(): "
                                "Retryable Error rc=0x%X, eid=0x%X, tgt=0x%X, "
-                               "retry/MAX=%d/%d. Save error and retry",
+                               "retry=%d. Save error and retry",
                                err_retryable->reasonCode(),
                                err_retryable->eid(),
                                TARGETING::get_huid(i_target),
@@ -615,13 +613,29 @@ errlHndl_t nvdimmReadData( TARGETING::Target * i_target,
                                                .addToLog(err_retryable);
 
                 errlCommit(err_retryable, NVDIMM_COMP_ID);
+
+                // Add trace of what operation failed for returned error
+                TRACFCOMP(g_trac_nvdimm,
+                          ERR_MRK"nvdimmReadData(): I2C Read failed on "
+                          "%d/%d/0x%0X",
+                          i_i2cInfo.port, i_i2cInfo.engine, i_i2cInfo.devAddr );
+
+                // Printing mux info separately, if combined, nothing is displayed
+                char* l_muxPath = i_i2cInfo.i2cMuxPath.toString();
+                TRACFCOMP(g_trac_nvdimm, ERR_MRK"nvdimmReadData(): "
+                          "muxSelector=0x%X, muxPath=%s",
+                          i_i2cInfo.i2cMuxBusSelector,
+                          l_muxPath);
+                free(l_muxPath);
+                l_muxPath = nullptr;
             }
             else
             {
                 // Since we eventually succeeded, delete original retryable error
-                TRACFCOMP(g_trac_nvdimm, "nvdimmReadData(): Op successful, "
-                          "deleting saved retryable err eid=0x%X, plid=0x%X",
-                          err_retryable->eid(), err_retryable->plid());
+                TRACUCOMP(g_trac_nvdimm, "nvdimmReadData(): Op successful, "
+                          "after %d retries. Deleting saved retryable err eid="
+                          "0x%X, plid=0x%X",
+                          retry, err_retryable->eid(), err_retryable->plid());
 
                 delete err_retryable;
                 err_retryable = nullptr;
@@ -767,7 +781,7 @@ errlHndl_t nvdimmWrite ( TARGETING::Target * i_target,
 
             // Printing mux info separately, if combined, nothing is displayed
             char* l_muxPath = i_i2cInfo.i2cMuxPath.toString();
-            TRACFCOMP(g_trac_nvdimm, "nvdimmWrite(): "
+            TRACUCOMP(g_trac_nvdimm, "nvdimmWrite(): "
                       "muxSelector=0x%X, muxPath=%s",
                       i_i2cInfo.i2cMuxBusSelector,
                       l_muxPath);
@@ -816,7 +830,7 @@ errlHndl_t nvdimmWrite ( TARGETING::Target * i_target,
         io_buflen = total_bytes_written;
 
 
-        TRACSCOMP( g_trac_nvdimmr,
+        TRACUCOMP( g_trac_nvdimmr,
                    "NVDIMM WRITE END   : Offset %.2X : Len %d",
                    i_i2cInfo.offset, io_buflen );
     } while( 0 );
@@ -904,7 +918,7 @@ errlHndl_t nvdimmWriteData( TARGETING::Target * i_target,
              }
              else // Handle retryable error
              {
-                 TRACFCOMP(g_trac_nvdimm, ERR_MRK"nvdimmWriteData(): I2C "
+                 TRACUCOMP(g_trac_nvdimm, ERR_MRK"nvdimmWriteData(): I2C "
                            "Write retryable fail %d/%d/0x%X, "
                            "ldl=%d, offset=0x%X, aS=%d, writePageSize = %x",
                            i_i2cInfo.port, i_i2cInfo.engine,
@@ -914,7 +928,7 @@ errlHndl_t nvdimmWriteData( TARGETING::Target * i_target,
 
                  // Printing mux info separately, if combined, nothing is displayed
                  char* l_muxPath = i_i2cInfo.i2cMuxPath.toString();
-                 TRACFCOMP(g_trac_nvdimm, ERR_MRK"nvdimmWriteData(): "
+                 TRACUCOMP(g_trac_nvdimm, ERR_MRK"nvdimmWriteData(): "
                            "muxSelector=0x%X, muxPath=%s",
                            i_i2cInfo.i2cMuxBusSelector,
                            l_muxPath);
@@ -930,7 +944,7 @@ errlHndl_t nvdimmWriteData( TARGETING::Target * i_target,
                          // Save original retryable error
                          err_retryable = err;
 
-                         TRACFCOMP( g_trac_nvdimm, ERR_MRK"nvdimmWriteData(): "
+                         TRACUCOMP( g_trac_nvdimm, ERR_MRK"nvdimmWriteData(): "
                                     "Error rc=0x%X, eid=0x%X plid=0x%X, "
                                     "tgt=0x%X, retry/MAX=%d/%d. Save error "
                                     "and retry",
@@ -945,7 +959,7 @@ errlHndl_t nvdimmWriteData( TARGETING::Target * i_target,
                      else
                      {
                          // Add data to original retryable error
-                         TRACFCOMP( g_trac_nvdimm, ERR_MRK"nvdimmWriteData(): "
+                         TRACUCOMP( g_trac_nvdimm, ERR_MRK"nvdimmWriteData(): "
                                     "Another Retryable Error rc=0x%X, eid=0x%X "
                                     "plid=0x%X, tgt=0x%X, retry/MAX=%d/%d. "
                                     "Delete error and retry",
@@ -990,6 +1004,24 @@ errlHndl_t nvdimmWriteData( TARGETING::Target * i_target,
          {
              if (err)
              {
+                 // Trace failure write parameters
+                 TRACFCOMP(g_trac_nvdimm, ERR_MRK"nvdimmWriteData(): I2C "
+                           "Write retryable fail %d/%d/0x%X, "
+                           "ldl=%d, offset=0x%X, aS=%d, writePageSize = %x",
+                           i_i2cInfo.port, i_i2cInfo.engine,
+                           i_i2cInfo.devAddr, i_dataLen,
+                           i_i2cInfo.offset, i_i2cInfo.addrSize,
+                           i_i2cInfo.writePageSize);
+
+                 // Printing mux info separately, if combined, nothing is displayed
+                 char* l_muxPath = i_i2cInfo.i2cMuxPath.toString();
+                 TRACFCOMP(g_trac_nvdimm, ERR_MRK"nvdimmWriteData(): "
+                           "muxSelector=0x%X, muxPath=%s",
+                           i_i2cInfo.i2cMuxBusSelector,
+                           l_muxPath);
+                 free(l_muxPath);
+                 l_muxPath = nullptr;
+
                  // commit original retryable error with new err PLID
                  err_retryable->plid(err->plid());
                  TRACFCOMP(g_trac_nvdimm, "nvdimmWriteData(): Committing saved "
@@ -1005,7 +1037,7 @@ errlHndl_t nvdimmWriteData( TARGETING::Target * i_target,
              else
              {
                  // Since we eventually succeeded, delete original retryable error
-                 TRACFCOMP(g_trac_nvdimm, "nvdimmWriteData(): Op successful, "
+                 TRACUCOMP(g_trac_nvdimm, "nvdimmWriteData(): Op successful, "
                            "deleting saved retryable err eid=0x%X, plid=0x%X",
                            err_retryable->eid(), err_retryable->plid());
 
@@ -1195,7 +1227,7 @@ errlHndl_t nvdimmReadAttributes ( TARGETING::Target * i_target,
 
     // Printing mux info separately, if combined, nothing is displayed
     char* l_muxPath = o_i2cInfo.i2cMuxPath.toString();
-    TRACFCOMP(g_trac_nvdimm, "nvdimmReadAttributes(): "
+    TRACUCOMP(g_trac_nvdimm, "nvdimmReadAttributes(): "
               "muxSelector=0x%X, muxPath=%s",
               o_i2cInfo.i2cMuxBusSelector,
               l_muxPath);
