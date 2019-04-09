@@ -69,7 +69,6 @@ namespace mss
 namespace nvdimm
 {
 
-
 ///
 /// @brief Wrapper to read MAINT_ADDR_MODE_EN
 /// Specialization for TARGET_TYPE_MCA
@@ -592,6 +591,7 @@ template<>
 fapi2::ReturnCode post_restore_transition( const fapi2::Target<fapi2::TARGET_TYPE_MCA>& i_target )
 {
     mss::states l_maint_addr_enabled = mss::states::LOW;
+    mss::states l_refresh_overrun_mask = mss::states::OFF;
     const bool NVDIMM_WORKAROUND = true;
 
     FAPI_TRY(get_maint_addr_mode_en(i_target, l_maint_addr_enabled));
@@ -602,6 +602,10 @@ fapi2::ReturnCode post_restore_transition( const fapi2::Target<fapi2::TARGET_TYP
         //this bit on can interfere with other ports on the same mcbist
         FAPI_TRY(change_maint_addr_mode_en(i_target, mss::states::LOW));
     }
+
+    // Save the current mask value and mask the refresh overrun error
+    FAPI_TRY(get_refresh_overrun_mask(i_target, l_refresh_overrun_mask));
+    FAPI_TRY(change_refresh_overrun_mask(i_target, mss::states::ON));
 
     // Restore the rcd
     FAPI_TRY( rcd_restore( i_target ) );
@@ -618,8 +622,12 @@ fapi2::ReturnCode post_restore_transition( const fapi2::Target<fapi2::TARGET_TYP
     // Latch in the rank averaged vref value
     FAPI_TRY(wr_vref_latch(i_target));
 
-    //Restore main_addr_mode_en to previous setting
+    // Restore main_addr_mode_en to previous setting
     FAPI_TRY(change_maint_addr_mode_en(i_target, l_maint_addr_enabled));
+
+    // Restore the refresh overrun mask to previous and clear the fir
+    FAPI_TRY(clear_refresh_overrun_fir(i_target));
+    FAPI_TRY(change_refresh_overrun_mask(i_target, l_refresh_overrun_mask));
 
 fapi_try_exit:
     return fapi2::current_err;
