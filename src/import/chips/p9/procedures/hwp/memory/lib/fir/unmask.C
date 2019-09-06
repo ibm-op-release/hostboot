@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2016,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2016,2021                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -76,8 +76,6 @@ fapi2::ReturnCode after_draminit_mc( const fapi2::Target<TARGET_TYPE_MCBIST>& i_
     .checkstop<MCBIST_MCBISTFIRQ_MCBIST_BRODCAST_OUT_OF_SYNC>();
 
     FAPI_TRY(l_mcbist_fir_reg.write(), "unable to write fir::reg %d", MCBIST_MCBISTFIRQ);
-
-    FAPI_TRY(mss::workarounds::mcbist::wat_debug_attention(i_target));
 
     for (const auto& p : mss::find_targets<TARGET_TYPE_MCA>(i_target))
     {
