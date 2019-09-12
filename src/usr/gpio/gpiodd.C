@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2014,2019                        */
+/* Contributors Listed Below - COPYRIGHT 2014,2024                        */
 /* [+] Google Inc.                                                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
@@ -77,8 +77,7 @@ errlHndl_t gpioPerformOp(DeviceFW::OperationType i_opType,
     gpioInfo.deviceType = va_arg( i_args, uint64_t );
     gpioInfo.portAddr   = va_arg( i_args, uint64_t );
 
-//MAB make TRACD
-    TRACFCOMP(g_trac_gpio, ENTER_MRK"gpioPerformOp(): "
+    TRACDCOMP(g_trac_gpio, ENTER_MRK"gpioPerformOp(): "
               "optype %d deviceType %d portAddr %d",
               i_opType, gpioInfo.deviceType, gpioInfo.portAddr);
 

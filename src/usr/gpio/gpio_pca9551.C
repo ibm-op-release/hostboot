@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2019                             */
+/* Contributors Listed Below - COPYRIGHT 2019,2024                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -47,7 +47,7 @@
 
 extern trace_desc_t* g_trac_gpio;
 
-// Set to TRACFCOMP to enble unit race
+// Set to TRACFCOMP to enable unit trace
 #define TRACUCOMP(args...)  TRACDCOMP(args)
 
 using namespace DeviceFW;

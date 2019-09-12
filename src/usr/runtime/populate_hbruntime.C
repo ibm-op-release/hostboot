@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2016,2020                        */
+/* Contributors Listed Below - COPYRIGHT 2016,2024                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -1878,6 +1878,13 @@ errlHndl_t populate_hbSecurebootData ( void )
 
         // populate security override setting
         l_sysSecSets->sbeSecBackdoor = SECUREBOOT::getSbeSecurityBackdoor();
+
+        // populate "System Physical Presence has been asserted"
+        TARGETING::Target* sys = nullptr;
+        TARGETING::targetService().getTopLevelTarget( sys );
+        assert(sys != nullptr, "populate_hbSecurebootData() - Could not obtain top level target");
+        l_sysSecSets->physicalPresenceAsserted =
+            sys->getAttr<TARGETING::ATTR_PHYS_PRES_ASSERTED>();
 
         // populate TPM config bits in hdat
         bool tpmRequired = false;
