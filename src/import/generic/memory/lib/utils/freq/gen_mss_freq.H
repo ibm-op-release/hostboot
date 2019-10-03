@@ -472,6 +472,7 @@ inline fapi2::ReturnCode supported_freqs(const fapi2::Target<TT::FREQ_TARGET_TYP
     std::vector<std::vector<uint32_t>> l_vpd_supported_freqs;
     std::vector<uint32_t> l_spd_supported_freq;
     std::vector<uint8_t> l_deconfigured = {0};
+    std::vector<fapi2::Target<TT::PORT_TARGET_TYPE>> l_deconfigured_targets;
 
     // Retrieve system MRW, SPD, and VPD constraints
     FAPI_TRY( max_allowed_dimm_freq<P>(l_max_freqs.data()), "%s max_allowed_dimm_freq", mss::c_str(i_target) );
@@ -496,6 +497,7 @@ inline fapi2::ReturnCode supported_freqs(const fapi2::Target<TT::FREQ_TARGET_TYP
     FAPI_TRY( l_scoreboard.template resolve<P>(i_target,
               l_vpd_supported_freqs,
               l_deconfigured,
+              l_deconfigured_targets,
               o_freqs) );
 
     FAPI_INF("%s supported freqs:", mss::c_str(i_target));
