@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2016,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2016,2019                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -792,8 +792,12 @@ fapi2::ReturnCode continue_cmd( const fapi2::Target<TARGET_TYPE_MCBIST>& i_targe
         // Read-modify-write the fields in the program.
         FAPI_TRY( mss::getScom(i_target, TT::MCBAGRAQ_REG, l_program.iv_addr_gen) );
 
-        // Configure broadcast mode if needed
-        FAPI_TRY(mss::mcbist::configure_broadcast_mode(i_target, l_program));
+        // Note: we are specifically not configuring broadcast mode here
+        // The continue command is called by PRD exclusively at mainline
+        // If we're at mainline, we can't run in broadcast mode
+        // If we ever need to call continue elsewhere, we'll need to do the following
+        // 1) add the function to configure broadcast mode
+        // 2) add in a switch to disable broadcast mode if we're at runtime
 
         l_program.change_end_boundary(i_end);
 
