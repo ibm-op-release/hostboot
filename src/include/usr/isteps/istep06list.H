@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2012,2019                        */
+/* Contributors Listed Below - COPYRIGHT 2012,2024                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -235,6 +235,10 @@ const DepModInfo  g_istep06Dependancies = {
       DEP_LIB(libimageprocs.so),
       DEP_LIB(libp9_cpuWkup.so),
       DEP_LIB(libisteps_nest.so),
+      DEP_LIB(libruntime.so),
+#ifdef CONFIG_SECUREBOOT
+      DEP_LIB(libsecureboot_ext.so),
+#endif
       NULL
     }
 };

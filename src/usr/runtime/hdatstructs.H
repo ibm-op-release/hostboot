@@ -286,6 +286,7 @@ struct hdatSysParms_t
     uint8_t  hdatHwKeyHashValue[64];   // Hardware Keys Hash Value
     char     hdatSystemFamily[64];     // System Family/Vendor Name
     char     hdatSystemType[64];       // System Type/Vendor Type
+    uint16_t hdatKeyClearRequest;      // Host FW key clear requests
 } __attribute__ ((packed));
 
 
