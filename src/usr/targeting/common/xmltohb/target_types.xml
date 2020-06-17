@@ -5,7 +5,7 @@
 <!--                                                                        -->
 <!-- OpenPOWER HostBoot Project                                             -->
 <!--                                                                        -->
-<!-- Contributors Listed Below - COPYRIGHT 2012,2019                        -->
+<!-- Contributors Listed Below - COPYRIGHT 2012,2020                        -->
 <!-- [+] Google Inc.                                                        -->
 <!-- [+] International Business Machines Corp.                              -->
 <!--                                                                        -->
@@ -1274,6 +1274,9 @@
       <id>PARENT_DECONFIG_RULES</id>
     </attribute>
     <attribute>
+      <id>SECURE_VERSION_SEEPROM</id>
+    </attribute>
+    <attribute>
       <id>START_MEM_ADDRESS_FOR_PAYLOAD_TCE_TOKEN</id>
     </attribute>
     <attribute>
@@ -2204,6 +2207,9 @@
     </attribute>
     <attribute>
       <id>SBE_UPDATE_DISABLE</id>
+    </attribute>
+    <attribute>
+      <id>SECURE_VERSION_LOCKIN_POLICY</id>
     </attribute>
     <attribute>
       <id>SOCKET_POWER_NOMINAL</id>
