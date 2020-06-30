@@ -5,7 +5,7 @@
 #
 # OpenPOWER HostBoot Project
 #
-# Contributors Listed Below - COPYRIGHT 2012,2019
+# Contributors Listed Below - COPYRIGHT 2012,2020
 # [+] International Business Machines Corp.
 #
 #
@@ -227,7 +227,8 @@ GEN_STANDALONE_BIN_FILES = ${GEN_COMMON_BIN_FILES},TEST=EMPTY,TESTRO=EMPTY,TESTL
     DEFAULT_PARAMS = --build-all --emit-eccless ${TARGET_TEST:b--test} ${HB_STANDALONE:b--hb-standalone} \
                      ${CONFIG_SECUREBOOT:b--secureboot} --systemBinFiles ${GEN_DEFAULT_BIN_FILES} \
                      --pnorLayout ${PNOR_LAYOUT} ${KEY_TRANSITION_PARAMS} ${CORRUPT_PARAMS} \
-                     --hwKeyHashFile ${IMPRINT_HW_KEY_HASH}
+                     --hwKeyHashFile ${IMPRINT_HW_KEY_HASH} \
+                     --secure-version ${SIGNING_SECURITY_VERSION}
 .else
     PNOR_LAYOUT = ${pnorLayoutFake.xml:P}
     # Parameters passed into GEN_PNOR_IMAGE_SCRIPT.
@@ -465,7 +466,8 @@ ZZ2UGEN4_HBD_FINAL_IMG = ZZ-2U-GEN4.HBD.bin
                              --systemBinFiles ${GEN_ZZ2U_BIN_FILES} \
                              --systemBinFiles ${GEN_ZZGEN4_BIN_FILES} \
                              --systemBinFiles ${GEN_ZZ2UGEN4_BIN_FILES} \
-                             --hwKeyHashFile ${IMPRINT_HW_KEY_HASH}
+                             --hwKeyHashFile ${IMPRINT_HW_KEY_HASH} \
+                             --secure-version ${SIGNING_SECURITY_VERSION}
 .else
     # Parameters passed into GEN_PNOR_IMAGE_SCRIPT.
     GEN_NIMBUS_BIN_FILES = NIMBUS:HCODE=${${NIMBUS_HCODE_IMG}:P},HBD=${${NIMBUS_VPO_HBD_IMG}:P},CENHWIMG=EMPTY
