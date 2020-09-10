@@ -5,7 +5,7 @@
 #
 # OpenPOWER HostBoot Project
 #
-# Contributors Listed Below - COPYRIGHT 2017
+# Contributors Listed Below - COPYRIGHT 2017,2020
 # [+] International Business Machines Corp.
 #
 #
@@ -27,5 +27,5 @@ FFDC_INC=$(ROOTPATH)/chips/p9/procedures/hwp/lib/
 lib$(PROCEDURE)_DEPLIBS+=p9_pm_ocb_indir_setup_linear
 lib$(PROCEDURE)_DEPLIBS+=p9_cme_sram_access
 lib$(PROCEDURE)_DEPLIBS+=p9_ppe_state
-$(call ADD_MODULE_INCDIR,$(FFDC_INC))
+$(call ADD_MODULE_INCDIR,$(PROCEDURE),$(FFDC_INC))
 $(call BUILD_PROCEDURE)
