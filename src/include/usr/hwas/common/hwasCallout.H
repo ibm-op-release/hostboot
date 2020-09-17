@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2012,2019                        */
+/* Contributors Listed Below - COPYRIGHT 2012,2020                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -312,6 +312,11 @@ typedef struct callout_ud
             // one Target will follow
         };
     }; // union
+
+    // Default Ctor
+    // The struct is made up of a union of structs, so instead of trying
+    // to predict the default value for each, just setting all data to 0.
+    callout_ud() { memset(this, 0, sizeof(callout_ud)); }
 } __attribute__ ((packed)) callout_ud_t;
 
 
