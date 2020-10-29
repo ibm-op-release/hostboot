@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2016,2018                        */
+/* Contributors Listed Below - COPYRIGHT 2016,2020                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -50,8 +50,8 @@ constexpr uint64_t literal_0x100 = 0x100;
 constexpr uint64_t literal_0x200 = 0x200;
 constexpr uint64_t literal_0x300 = 0x300;
 constexpr uint64_t literal_0x0 = 0x0;
-constexpr uint64_t literal_0x8 = 0x8;
 constexpr uint64_t literal_0xFFF = 0xFFF;
+constexpr uint64_t literal_0x8 = 0x8;
 constexpr uint64_t literal_0xE000000000000000 = 0xE000000000000000;
 constexpr uint64_t literal_0x0000740000000000 = 0x0000740000000000;
 constexpr uint64_t literal_0x7F60B04500AC0000 = 0x7F60B04500AC0000;
@@ -3546,7 +3546,7 @@ fapi2::ReturnCode p9_npu_scom(const fapi2::Target<fapi2::TARGET_TYPE_PROC_CHIP>&
 
                 if ((l_def_NVLINK_ACTIVE == literal_1))
                 {
-                    l_scom_buffer.insert<60, 4, 60, uint64_t>(literal_0x8 );
+                    l_scom_buffer.insert<60, 4, 60, uint64_t>(literal_0xF );
                 }
 
                 FAPI_TRY(fapi2::putScom(TGT0, 0x5011345ull, l_scom_buffer));
@@ -4576,7 +4576,7 @@ fapi2::ReturnCode p9_npu_scom(const fapi2::Target<fapi2::TARGET_TYPE_PROC_CHIP>&
 
                 if ((l_def_NVLINK_ACTIVE == literal_1))
                 {
-                    l_scom_buffer.insert<60, 4, 60, uint64_t>(literal_0x8 );
+                    l_scom_buffer.insert<60, 4, 60, uint64_t>(literal_0xF );
                 }
 
                 FAPI_TRY(fapi2::putScom(TGT0, 0x5011645ull, l_scom_buffer));
