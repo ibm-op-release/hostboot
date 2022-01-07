@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2015,2019                        */
+/* Contributors Listed Below - COPYRIGHT 2015,2025                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -797,11 +797,12 @@ errlHndl_t tpmCmdGetCapNvIndexValidate(TpmTarget* io_target)
     TPM2_GetCapabilityIn* cmd =
         (TPM2_GetCapabilityIn*)dataBuf;
     bool foundRSAEKCert = false;
-    bool foundECCEKCert = false;
+    bool foundECCP256EKCert = false;
+    bool foundECCP384EKCert = false;
     bool foundPlatCert = false;
     bool moreData = false;
 
-    TRACUCOMP( g_trac_trustedboot,
+    TRACFCOMP( g_trac_trustedboot,
                ">>tpmCmdGetCapNvIndexValidate()" );
 
     do
@@ -891,8 +892,11 @@ errlHndl_t tpmCmdGetCapNvIndexValidate(TpmTarget* io_target)
               case NVIDX_RSAEKCERT:
                 foundRSAEKCert = true;
                 break;
-              case NVIDX_ECCEKCERT:
-                foundECCEKCert = true;
+              case NVIDX_ECC_P256_EKCERT:
+                foundECCP256EKCert = true;
+                break;
+              case NVIDX_ECC_P384_EKCERT:
+                foundECCP384EKCert = true;
                 break;
               case NVIDX_IBMPLATCERT:
                 foundPlatCert = true;
@@ -906,16 +910,21 @@ errlHndl_t tpmCmdGetCapNvIndexValidate(TpmTarget* io_target)
 
     } while ( 0 );
 
-    // Validate we found all we needed
-    if (NULL == err &&
-        (foundRSAEKCert == false || foundECCEKCert == false ||
-         foundPlatCert == false || moreData == true))
+    // Validate we found all we needed.  Note that TPMs can be provisioned with
+    // different ECC EK certificates (P256 or P384) and at least one of them is
+    // required.
+    if ((NULL == err) &&
+        (   (foundRSAEKCert == false)
+         || (   (foundECCP256EKCert == false)
+             && (foundECCP384EKCert == false))
+         || (foundPlatCert == false)
+         || moreData == true))
     {
         TRACFCOMP( g_trac_trustedboot,
                    "TPM GETCAP NVINDEX MISSING INDEX "
-                   "RSAEK(%d) ECCEK(%d) PLAT(%d) MD(%d)",
-                   foundRSAEKCert, foundECCEKCert, foundPlatCert,
-                   moreData);
+                   "RSAEK(%d) ECCP256EK(%d) ECCP384EK(%d) PLAT(%d) MD(%d)",
+                   foundRSAEKCert, foundECCP256EKCert, foundECCP384EKCert,
+                   foundPlatCert, moreData);
 
         /*@
          * @errortype
@@ -923,7 +932,7 @@ errlHndl_t tpmCmdGetCapNvIndexValidate(TpmTarget* io_target)
          * @severity         ERRL_SEV_UNRECOVERABLE
          * @moduleid         MOD_TPM_CMD_GETCAPNVINDEX
          * @userdata1[0:7]   foundRSAEKCert
-         * @userdata1[7:15]  foundECCEKCert
+         * @userdata1[8:15]  ECC EK cert found mask (0x80/0x40 = P256/P384)
          * @userdata1[16:23] foundPlatCert
          * @userdata1[24:31] moreData
          * @userdata1[32:63] 0
@@ -936,8 +945,10 @@ errlHndl_t tpmCmdGetCapNvIndexValidate(TpmTarget* io_target)
             RC_TPM_NVINDEX_VALIDATE_FAIL,
             TWO_UINT32_TO_UINT64(
                 FOUR_UINT8_TO_UINT32(
-                    foundRSAEKCert,foundECCEKCert,
-                    foundPlatCert,moreData),
+                    foundRSAEKCert,
+                    ((foundECCP256EKCert << 7) | (foundECCP384EKCert << 6)),
+                    foundPlatCert,
+                    moreData),
                 0),
             0,
             ERRORLOG::ErrlEntry::NO_SW_CALLOUT);
@@ -954,7 +965,7 @@ errlHndl_t tpmCmdGetCapNvIndexValidate(TpmTarget* io_target)
                                  HWAS::SRCI_PRIORITY_LOW);
     }
 
-    TRACDCOMP( g_trac_trustedboot,
+    TRACFCOMP( g_trac_trustedboot,
                "<<tpmCmdGetCapNvIndexValidate() - %s",
                ((TB_SUCCESS == err) ? "No Error" : "With Error") );
     return err;
