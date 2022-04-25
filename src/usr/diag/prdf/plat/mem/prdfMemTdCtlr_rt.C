@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2016,2019                        */
+/* Contributors Listed Below - COPYRIGHT 2016,2022                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -45,6 +45,11 @@
 #include <prdfP9McaDataBundle.H>
 #include <prdfP9McaExtraSig.H>
 #include <prdfPlatServices.H>
+
+
+#ifdef __HOSTBOOT_RUNTIME
+#include <prdfMemDynDealloc.H>
+#endif
 
 using namespace TARGETING;
 
@@ -368,6 +373,7 @@ uint32_t __handleNceEte( ExtensibleChip * i_chip,
     uint32_t o_rc = SUCCESS;
 
     MemRank rank = i_addr.getRank();
+    bool unexpectedSymCount = false;
 
     do
     {
@@ -388,10 +394,64 @@ uint32_t __handleNceEte( ExtensibleChip * i_chip,
         uint32_t count = symData.size();
         switch ( T )
         {
-            case TYPE_MCA:       PRDF_ASSERT( 1 <= count && count <= 2 ); break;
-            case TYPE_MBA:       PRDF_ASSERT( 1 == count               ); break;
-            case TYPE_OCMB_CHIP: PRDF_ASSERT( 1 <= count && count <= 2 ); break;
+            case TYPE_MCA:
+            {
+                // Expected 1 or 2 symbols
+                if ( count < 1 || count > 2 )
+                {
+                    unexpectedSymCount = true;
+                }
+                break;
+            }
+            case TYPE_MBA:
+            {
+                // Expected 1 symbol
+                if ( count != 1 )
+                {
+                    unexpectedSymCount = true;
+                }
+                break;
+            }
+            case TYPE_OCMB_CHIP:
+            {
+                // Expected 1 or 2 symbols
+                if ( count < 1 || count > 2 )
+                {
+                    unexpectedSymCount = true;
+                }
+                break;
+            }
             default: PRDF_ASSERT( false );
+        }
+
+        // If there is an unexpected symbol count from the symbol counter
+        // registers, just callout the rank and perform dynamic memory
+        // deallocation if needed. Updating the CE table is missed in this
+        // case. This case typically shouldn't be hit and is mainly in case
+        // of strange behavior from the symbol counter registers.
+        if ( unexpectedSymCount )
+        {
+            PRDF_ERR( PRDF_FUNC "Unexpected symbol count from the per-symbol "
+                                "counter registers: %d", count );
+
+            // Add the rank to the callout list.
+            MemoryMru mm { i_chip->getTrgt(), rank,
+                           MemoryMruData::CALLOUT_RANK };
+            io_sc.service_data->SetCallout( mm );
+
+            #ifdef __HOSTBOOT_RUNTIME
+            if ( i_isHard )
+            {
+                // Dynamically deallocate the page.
+                if ( SUCCESS != MemDealloc::page<T>( i_chip, i_addr ) )
+                {
+                    PRDF_ERR( PRDF_FUNC "MemDealloc::page(0x%08x) failed",
+                              i_chip->getHuid() );
+                }
+            }
+            #endif
+
+            break;
         }
 
         for ( auto & d : symData )
