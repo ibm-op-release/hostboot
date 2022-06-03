@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2016,2019                        */
+/* Contributors Listed Below - COPYRIGHT 2016,2022                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -146,7 +146,8 @@ fapi2::ReturnCode pm_corequad_init(
 /// @return FAPI2_RC_SUCCESS on success or error return code
 ///
 fapi2::ReturnCode pm_disable_resclk(
-    const fapi2::Target<fapi2::TARGET_TYPE_EQ>& i_target);
+    const fapi2::Target<fapi2::TARGET_TYPE_EQ>& i_target,
+    const uint32_t i_qaccr_value);
 
 // ----------------------------------------------------------------------
 // Function definitions
@@ -638,7 +639,7 @@ fapi2::ReturnCode pm_corequad_reset(
         }
         else //Resonance clocks are still enabled
         {
-            FAPI_TRY(pm_disable_resclk(l_quad_chplt), "p9_pm_disable_resclk failed");
+            FAPI_TRY(pm_disable_resclk(l_quad_chplt, l_qaccr_value), "p9_pm_disable_resclk failed");
         }
     } //end of quad
 
@@ -648,17 +649,18 @@ fapi_try_exit:
 }
 
 fapi2::ReturnCode pm_disable_resclk(
-    const fapi2::Target<fapi2::TARGET_TYPE_EQ>& i_target)
+    const fapi2::Target<fapi2::TARGET_TYPE_EQ>& i_target,
+    const uint32_t i_qaccr_value)
 {
     FAPI_DBG(">> pm_disable_resclk...");
     fapi2::buffer<uint64_t> l_quad_data64;
     fapi2::buffer<uint64_t> l_core_data64;
     fapi2::buffer<uint64_t> l_data64;
     uint64_t l_address = 0;
-    uint16_t l_qaccr_value = 0;
+    uint16_t l_qaccr_value = i_qaccr_value;
     uint16_t l_caccr_value = 0;
     bool l_match = true;
-    uint8_t l_step = 0;
+    int8_t l_step = 0;
     fapi2::buffer<uint64_t> l_fmult;
     uint8_t i = RESCLK_FREQ_REGIONS;
     uint8_t l_poweroff_index = 0;
@@ -691,6 +693,10 @@ fapi2::ReturnCode pm_disable_resclk(
     l_fmult =  ((l_fmult * attr_freq_proc_refclock_khz ) / attr_proc_dpll_divider) / 1000;
 
     FAPI_INF("EQ_QPPM_DPLL_FREQ FMULT value %08x", l_fmult);
+
+    //Get power off index value
+    l_poweroff_index = p9_resclk_defines::RESCLK_INDEX_VEC.at(0).idx;
+    FAPI_INF ("POWER Of  index value %u", l_poweroff_index);
 
     //Match the freq read from dpll register with the
     //resonance index vector table
@@ -799,10 +805,10 @@ fapi2::ReturnCode pm_disable_resclk(
 
                 FAPI_INF ("Walking core index value %u", l_core_index);
 
-                l_step = l_core_index < l_quad_index ? 1 : -1;
+                l_step = l_core_index < l_poweroff_index ? 1 : -1;
 
 
-                while (l_core_index != l_quad_index)
+                while (l_core_index != l_poweroff_index)
                 {
                     l_core_index += l_step;
 
@@ -827,9 +833,6 @@ fapi2::ReturnCode pm_disable_resclk(
         } //end of core list
     } // end of ex list
 
-    //Get power off index value
-    l_poweroff_index = p9_resclk_defines::RESCLK_INDEX_VEC.at(0).idx;
-    FAPI_INF ("POWER Of  index value %u", l_poweroff_index);
 
     l_step = l_quad_index < l_poweroff_index ? 1 : -1;
 
