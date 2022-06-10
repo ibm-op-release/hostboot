@@ -673,7 +673,7 @@ fapi2::ReturnCode pm_disable_resclk(
     fapi2::buffer<uint64_t> l_core_data64;
     fapi2::buffer<uint64_t> l_data64;
     uint64_t l_address = 0;
-    uint16_t l_qaccr_value = i_qaccr_value;
+    uint16_t l_qaccr_value = (uint16_t)(i_qaccr_value >> 16);
     uint16_t l_caccr_value = 0;
     bool l_match = true;
     int8_t l_step = 0;
