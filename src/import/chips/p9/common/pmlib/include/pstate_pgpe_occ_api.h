@@ -5,7 +5,7 @@
 /*                                                                        */
 /* OpenPOWER HostBoot Project                                             */
 /*                                                                        */
-/* Contributors Listed Below - COPYRIGHT 2015,2017                        */
+/* Contributors Listed Below - COPYRIGHT 2015,2022                        */
 /* [+] International Business Machines Corp.                              */
 /*                                                                        */
 /*                                                                        */
@@ -62,16 +62,14 @@ enum MESSAGE_ID_IPI2HI
 #define PGPE_RC_SUCCESS                         0x01
 #define PGPE_WOF_RC_NOT_ENABLED                 0x10
 #define PGPE_RC_PSTATES_NOT_STARTED             0x11
-#define PGPE_RC_REQ_PSTATE_ALREADY_STARTED      0x12
-#define PGPE_RC_REQ_PSTATE_ALREADY_STOPPED      0x13
 #define PGPE_RC_OCC_NOT_PMCR_OWNER              0x14
 #define PGPE_RC_PM_COMPLEX_SUSPEND_SAFE_MODE    0x15
-#define PGPE_RC_WOF_ALREADY_ON                  0x16
-#define PGPE_RC_WOF_ALREADY_OFF                 0x17
 // Active quad mismatch with requested active quads.  PGPE did not switch
 // to using the new VFRT.  The original VFRT is still being used.
 #define PGPE_WOF_RC_VFRT_QUAD_MISMATCH  0x20
 #define PGPE_RC_REQ_WHILE_PENDING_ACK   0x21
+#define PGPE_RC_NULL_VFRT_POINTER       0x22
+#define PGPE_RC_INVALID_PMCR_OWNER         0x23
 
 //
 // PMCR Owner
