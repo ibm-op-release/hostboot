@@ -6,7 +6,7 @@
 #
 # OpenPOWER HostBoot Project
 #
-# Contributors Listed Below - COPYRIGHT 2011,2019
+# Contributors Listed Below - COPYRIGHT 2011,2026
 # [+] International Business Machines Corp.
 #
 #
@@ -155,7 +155,7 @@ timestamp=`date +'%H:%M:%S'`
 echo "$timestamp Starting autosample test..."
 
 # see simics license usage
-tail -n 500 /afs/rch/usr4/dlarson/public/stats/lic_usage.txt | grep hindsight
+#tail -n 500 /afs/rch/usr4/dlarson/public/stats/lic_usage.txt | grep hindsight
 
 # Run set up in current shell
 echo    "run autosimsetup.."

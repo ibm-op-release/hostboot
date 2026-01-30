@@ -6,7 +6,7 @@
 #
 # OpenPOWER HostBoot Project
 #
-# Contributors Listed Below - COPYRIGHT 2011,2019
+# Contributors Listed Below - COPYRIGHT 2011,2026
 # [+] International Business Machines Corp.
 #
 #
@@ -38,6 +38,5 @@
 mkdir -p $sb/simu/configs/
 grep -v PROC_EC $BACKING_BUILD/src/simu/configs/P9_NIMBUS.config > $sb/simu/configs/P9_NIMBUS.config
 echo "SETENV PROC_EC                22" >> $sb/simu/configs/P9_NIMBUS.config
-
 
 ##########################################################################
